@@ -81,6 +81,11 @@ data:
     enable: "kubernetes"
     kubernetes:
       namespace: $ack_namespace
+    etcd:
+      rootDirectory: openim
+      address: [ localhost:12379 ]
+      username: ''
+      password: ''
     rpcService:
       user: user-rpc-service
       friend: friend-rpc-service
@@ -91,6 +96,9 @@ data:
       auth: auth-rpc-service
       conversation: conversation-rpc-service
       third: third-rpc-service
+      chat: my-chat-rpc-service
+      admin: admin-rpc-service
+      bot: bot-rpc-service
 
   log.yml: |
     storageLocation: ./logs/
@@ -309,6 +317,197 @@ data:
     prometheus:
       enable: true
       ports:
+
+  webhooks.yml: |
+    url: http://127.0.0.1:10006/callbackExample
+    beforeSendSingleMsg:
+      enable: false
+      timeout: 5
+      failedContinue: true
+      deniedTypes: []
+    beforeUpdateUserInfoEx:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterUpdateUserInfoEx:
+      enable: false
+      timeout: 5
+    afterSendSingleMsg:
+      enable: false
+      timeout: 5
+      attentionIds: []
+      deniedTypes: []
+    beforeSendGroupMsg:
+      enable: false
+      timeout: 5
+      failedContinue: true
+      deniedTypes: []
+    beforeMsgModify:
+      enable: false
+      timeout: 5
+      failedContinue: true
+      deniedTypes: []
+    afterSendGroupMsg:
+      enable: false
+      timeout: 5
+      attentionIds: []
+      deniedTypes: []
+    afterUserOnline:
+      enable: false
+      timeout: 5
+    afterUserOffline:
+      enable: false
+      timeout: 5
+    afterUserKickOff:
+      enable: false
+      timeout: 5
+    beforeOfflinePush:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    beforeOnlinePush:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    beforeGroupOnlinePush:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    beforeAddFriend:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    beforeUpdateUserInfo:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterUpdateUserInfo:
+      enable: false
+      timeout: 5
+    beforeCreateGroup:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterCreateGroup:
+      enable: false
+      timeout: 5
+    beforeMemberJoinGroup:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    beforeSetGroupMemberInfo:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterSetGroupMemberInfo:
+      enable: false
+      timeout: 5
+    afterQuitGroup:
+      enable: false
+      timeout: 5
+    afterKickGroupMember:
+      enable: false
+      timeout: 5
+    afterDismissGroup:
+      enable: false
+      timeout: 5
+    beforeApplyJoinGroup:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterGroupMsgRead:
+      enable: false
+      timeout: 5
+    afterSingleMsgRead:
+      enable: false
+      timeout: 5
+    beforeUserRegister:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterUserRegister:
+      enable: false
+      timeout: 5
+    afterTransferGroupOwner:
+      enable: false
+      timeout: 5
+    beforeSetFriendRemark:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterSetFriendRemark:
+      enable: false
+      timeout: 5
+    afterGroupMsgRevoke:
+      enable: false
+      timeout: 5
+    afterJoinGroup:
+      enable: false
+      timeout: 5
+    beforeInviteUserToGroup:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterSetGroupInfo:
+      enable: false
+      timeout: 5
+    beforeSetGroupInfo:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterSetGroupInfoEx:
+      enable: false
+      timeout: 5
+    beforeSetGroupInfoEx:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterRevokeMsg:
+      enable: false
+      timeout: 5
+    beforeAddBlack:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterAddFriend:
+      enable: false
+      timeout: 5
+    beforeAddFriendAgree:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterAddFriendAgree:
+      enable: false
+      timeout: 5
+    afterDeleteFriend:
+      enable: false
+      timeout: 5
+    beforeImportFriends:
+      enable: false
+      timeout: 5
+      failedContinue: true
+    afterImportFriends:
+      enable: false
+      timeout: 5
+    afterRemoveBlack:
+      enable: false
+      timeout: 5
+    beforeCreateSingleChatConversations:
+      enable: false
+      timeout: 5
+      failedContinue: false
+    afterCreateSingleChatConversations:
+      enable: false
+      timeout: 5
+      failedContinue: false
+    beforeCreateGroupChatConversations:
+      enable: false
+      timeout: 5
+      failedContinue: false
+    afterCreateGroupChatConversations:
+      enable: false
+      timeout: 5
+      failedContinue: false
 
 ---
 apiVersion: apps/v1
