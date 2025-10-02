@@ -275,8 +275,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: $ack_deployment.example.com  # 请修改为您的域名
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix
