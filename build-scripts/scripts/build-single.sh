@@ -596,6 +596,8 @@ spec:
           value: "$tag"
         - name: CONFIG_PATH
           value: "/config"
+        - name: RUNTIME_ENV
+          value: "standalone"
         volumeMounts:
         - name: config-volume
           mountPath: "/config"
@@ -651,6 +653,8 @@ spec:
           value: "$tag"
         - name: CONFIG_PATH
           value: "/app/config"
+        - name: RUNTIME_ENV
+          value: "standalone"
         resources:
           requests:
             memory: "$memory_request"
