@@ -105,7 +105,25 @@ spec:
         - name: IMENV_DISCOVERY_ENABLE
           value: "etcd"
         - name: IMENV_DISCOVERY_ETCD_ADDR
-          value: "etcd-service.etcd.svc.cluster.local:2379"
+          value: "etcd.openim-infrastructure.svc.cluster.local:2379"
+        - name: IMENV_MONGODB_ADDRESS
+          value: "mongodb.openim-infrastructure.svc.cluster.local:27017"
+        - name: IMENV_MONGODB_USERNAME
+          value: "openIM"
+        - name: IMENV_MONGODB_PASSWORD
+          value: "openIM123"
+        - name: IMENV_REDIS_ADDRESS
+          value: "redis.openim-infrastructure.svc.cluster.local:6379"
+        - name: IMENV_REDIS_PASSWORD
+          value: "openIM123"
+        - name: IMENV_KAFKA_ADDRESS
+          value: "kafka.openim-infrastructure.svc.cluster.local:9094"
+        - name: IMENV_MINIO_ENDPOINT
+          value: "minio.openim-infrastructure.svc.cluster.local:9000"
+        - name: IMENV_MINIO_ACCESS_KEY_ID
+          value: "root"
+        - name: IMENV_MINIO_SECRET_ACCESS_KEY
+          value: "openIM123"
         resources:
           requests:
             memory: "$memory_request"
