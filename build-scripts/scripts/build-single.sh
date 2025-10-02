@@ -9,6 +9,127 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/utils.sh"
 
+# 生成ACK部署配置函数
+generate_ack_deployment() {
+    local project_name=$1
+    local tag=$2
+    
+    local ack_deployment_file="projects/$project_name/ack-deployment.yaml"
+    create_dir "projects/$project_name"
+    
+    # 获取项目配置
+    local dockerhub_repo=$(get_project_config "$project_name" "dockerhub_repo")
+    local ack_namespace=$(get_project_config "$project_name" "ack_namespace")
+    local ack_deployment=$(get_project_config "$project_name" "ack_deployment")
+    local backend_server=$(get_project_config "$project_name" "backend_server")
+    local container_port=$(get_project_config "$project_name" "ports.container")
+    local host_port=$(get_project_config "$project_name" "ports.host")
+    
+    # 获取资源限制
+    local memory_request=$(get_project_config "$project_name" "resources.requests.memory")
+    local cpu_request=$(get_project_config "$project_name" "resources.requests.cpu")
+    local memory_limit=$(get_project_config "$project_name" "resources.limits.memory")
+    local cpu_limit=$(get_project_config "$project_name" "resources.limits.cpu")
+    
+    cat > "$ack_deployment_file" << EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $ack_deployment
+  namespace: $ack_namespace
+  labels:
+    app: $ack_deployment
+    version: $tag
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: $ack_deployment
+  template:
+    metadata:
+      labels:
+        app: $ack_deployment
+        version: $tag
+    spec:
+      containers:
+      - name: $ack_deployment
+        image: $dockerhub_repo:$tag
+        ports:
+        - containerPort: $container_port
+        env:
+        - name: BACKEND_SERVER
+          value: "$backend_server"
+        - name: NODE_ENV
+          value: "production"
+        - name: VERSION
+          value: "$tag"
+        resources:
+          requests:
+            memory: "$memory_request"
+            cpu: "$cpu_request"
+          limits:
+            memory: "$memory_limit"
+            cpu: "$cpu_limit"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: $container_port
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: $container_port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $ack_deployment-service
+  namespace: $ack_namespace
+  labels:
+    app: $ack_deployment
+spec:
+  selector:
+    app: $ack_deployment
+  ports:
+  - protocol: TCP
+    port: $host_port
+    targetPort: $container_port
+  type: LoadBalancer
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: $ack_deployment-ingress
+  namespace: $ack_namespace
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - host: $ack_deployment.example.com  # 请修改为您的域名
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: $ack_deployment-service
+            port:
+              number: $host_port
+EOF
+
+    print_success "ACK部署配置已生成: $ack_deployment_file"
+    print_info "使用方法: kubectl apply -f $ack_deployment_file"
+}
+
 # 项目名称
 PROJECT_NAME=$1
 TAG=${2:-$(date +%Y%m%d-%H%M%S)}
@@ -158,123 +279,3 @@ log_to_file "$LOG_FILE" "构建完成: $PROJECT_NAME, 标签: $TAG, 时间: ${BU
 # 发送通知
 send_notification "构建完成" "项目 $PROJECT_NAME_FULL 构建完成，标签: $TAG" "success"
 
-# 生成ACK部署配置函数
-generate_ack_deployment() {
-    local project_name=$1
-    local tag=$2
-    
-    local ack_deployment_file="projects/$project_name/ack-deployment.yaml"
-    create_dir "projects/$project_name"
-    
-    # 获取项目配置
-    local dockerhub_repo=$(get_project_config "$project_name" "dockerhub_repo")
-    local ack_namespace=$(get_project_config "$project_name" "ack_namespace")
-    local ack_deployment=$(get_project_config "$project_name" "ack_deployment")
-    local backend_server=$(get_project_config "$project_name" "backend_server")
-    local container_port=$(get_project_config "$project_name" "ports.container")
-    local host_port=$(get_project_config "$project_name" "ports.host")
-    
-    # 获取资源限制
-    local memory_request=$(get_project_config "$project_name" "resources.requests.memory")
-    local cpu_request=$(get_project_config "$project_name" "resources.requests.cpu")
-    local memory_limit=$(get_project_config "$project_name" "resources.limits.memory")
-    local cpu_limit=$(get_project_config "$project_name" "resources.limits.cpu")
-    
-    cat > "$ack_deployment_file" << EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: $ack_deployment
-  namespace: $ack_namespace
-  labels:
-    app: $ack_deployment
-    version: $tag
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: $ack_deployment
-  template:
-    metadata:
-      labels:
-        app: $ack_deployment
-        version: $tag
-    spec:
-      containers:
-      - name: $ack_deployment
-        image: $dockerhub_repo:$tag
-        ports:
-        - containerPort: $container_port
-        env:
-        - name: BACKEND_SERVER
-          value: "$backend_server"
-        - name: NODE_ENV
-          value: "production"
-        - name: VERSION
-          value: "$tag"
-        resources:
-          requests:
-            memory: "$memory_request"
-            cpu: "$cpu_request"
-          limits:
-            memory: "$memory_limit"
-            cpu: "$cpu_limit"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: $container_port
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: $container_port
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        imagePullPolicy: Always
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: $ack_deployment-service
-  namespace: $ack_namespace
-  labels:
-    app: $ack_deployment
-spec:
-  selector:
-    app: $ack_deployment
-  ports:
-  - protocol: TCP
-    port: $host_port
-    targetPort: $container_port
-  type: LoadBalancer
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: $ack_deployment-ingress
-  namespace: $ack_namespace
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-spec:
-  rules:
-  - host: $ack_deployment.example.com  # 请修改为您的域名
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: $ack_deployment-service
-            port:
-              number: $host_port
-EOF
-
-    print_success "ACK部署配置已生成: $ack_deployment_file"
-    print_info "使用方法: kubectl apply -f $ack_deployment_file"
-}
