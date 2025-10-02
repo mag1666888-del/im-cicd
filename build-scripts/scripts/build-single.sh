@@ -100,6 +100,8 @@ spec:
           value: "production"
         - name: VERSION
           value: "$tag"
+        - name: CONFIG_PATH
+          value: "/app/config"
         resources:
           requests:
             memory: "$memory_request"
