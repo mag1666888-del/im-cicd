@@ -104,7 +104,7 @@ spec:
           value: "/app/config"
         - name: IMENV_DISCOVERY_ENABLE
           value: "etcd"
-        - name: IMENV_DISCOVERY_ETCD_ADDR
+        - name: IMENV_DISCOVERY_ETCD_ADDRESS
           value: "etcd.openim-infrastructure.svc.cluster.local:2379"
         - name: IMENV_MONGODB_ADDRESS
           value: "mongodb.openim-infrastructure.svc.cluster.local:27017"
