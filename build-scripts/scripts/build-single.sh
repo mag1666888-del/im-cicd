@@ -68,7 +68,83 @@ generate_ack_deployment() {
           failureThreshold: 3"
     fi
 
-    cat > "$ack_deployment_file" << EOF
+    # 为open-im-server和chat创建ConfigMap
+    if [[ "$project_name" == "open-im-server" || "$project_name" == "chat" ]]; then
+        cat > "$ack_deployment_file" << EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: $ack_deployment-config
+  namespace: $ack_namespace
+data:
+  discovery.yml: |
+    enable: "kubernetes"
+    kubernetes:
+      namespace: $ack_namespace
+    rpcService:
+      user: user-rpc-service
+      friend: friend-rpc-service
+      msg: msg-rpc-service
+      push: push-rpc-service
+      messageGateway: messagegateway-rpc-service
+      group: group-rpc-service
+      auth: auth-rpc-service
+      conversation: conversation-rpc-service
+      third: third-rpc-service
+
+  log.yml: |
+    storageLocation: ./logs/
+    rotationTime: 24
+    remainRotationCount: 2
+    remainLogLevel: 6
+    isStdout: true
+    isJson: false
+    isSimplify: true
+
+  mongodb.yml: |
+    uri: ''
+    address: [ mongodb.openim-infrastructure.svc.cluster.local:27017 ]
+    database: openim_v3
+    username: 'openIM'
+    password: 'openIM123'
+    authSource: openim_v3
+    maxPoolSize: 100
+    maxRetry: 10
+
+  redis.yml: |
+    address: [ redis.openim-infrastructure.svc.cluster.local:6379 ]
+    password: 'openIM123'
+    db: 0
+    poolSize: 30
+    minIdleConns: 10
+
+  kafka.yml: |
+    username: ''
+    password: ''
+    latestMsgToRedis:
+      topic: 'latestMsgToRedis'
+    offlineMsgToMongo:
+      topic: 'offlineMsgToMongo'
+    msgToPush:
+      topic: 'msgToPush'
+    msgToModify:
+      topic: 'msgToModify'
+    consumerGroupID:
+      latestMsgToRedis: 'latestMsgToRedis'
+      offlineMsgToMongo: 'offlineMsgToMongo'
+      msgToPush: 'msgToPush'
+      msgToModify: 'msgToModify'
+    addr: [ kafka.openim-infrastructure.svc.cluster.local:9094 ]
+
+  minio.yml: |
+    endpoint: 'minio.openim-infrastructure.svc.cluster.local:9000'
+    accessKeyID: 'root'
+    secretAccessKey: 'openIM123'
+    useSSL: false
+    signEndpoint: 'minio.openim-infrastructure.svc.cluster.local:9000'
+    bucket: 'openim'
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -102,30 +178,10 @@ spec:
           value: "$tag"
         - name: CONFIG_PATH
           value: "/app/config"
-        - name: IMENV_DISCOVERY_ENABLE
-          value: "etcd"
-        - name: IMENV_DISCOVERY_ETCD_ADDRESS
-          value: "etcd.openim-infrastructure.svc.cluster.local:2379"
-        - name: DEPLOYMENT_TYPE
-          value: "standalone"
-        - name: IMENV_MONGODB_ADDRESS
-          value: "mongodb.openim-infrastructure.svc.cluster.local:27017"
-        - name: IMENV_MONGODB_USERNAME
-          value: "openIM"
-        - name: IMENV_MONGODB_PASSWORD
-          value: "openIM123"
-        - name: IMENV_REDIS_ADDRESS
-          value: "redis.openim-infrastructure.svc.cluster.local:6379"
-        - name: IMENV_REDIS_PASSWORD
-          value: "openIM123"
-        - name: IMENV_KAFKA_ADDRESS
-          value: "kafka.openim-infrastructure.svc.cluster.local:9094"
-        - name: IMENV_MINIO_ENDPOINT
-          value: "minio.openim-infrastructure.svc.cluster.local:9000"
-        - name: IMENV_MINIO_ACCESS_KEY_ID
-          value: "root"
-        - name: IMENV_MINIO_SECRET_ACCESS_KEY
-          value: "openIM123"
+        volumeMounts:
+        - name: config-volume
+          mountPath: "/app/config"
+          readOnly: true
         resources:
           requests:
             memory: "$memory_request"
@@ -136,6 +192,60 @@ spec:
 $LIVENESS_PROBE
 $READINESS_PROBE
         imagePullPolicy: Always
+      volumes:
+      - name: config-volume
+        configMap:
+          name: $ack_deployment-config
+    else
+        # 其他项目使用原来的配置
+        cat > "$ack_deployment_file" << EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $ack_deployment
+  namespace: $ack_namespace
+  labels:
+    app: $ack_deployment
+    version: $tag
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: $ack_deployment
+  template:
+    metadata:
+      labels:
+        app: $ack_deployment
+        version: $tag
+    spec:
+      containers:
+      - name: $ack_deployment
+        image: $dockerhub_repo:$tag
+        ports:
+        - containerPort: $container_port
+        env:
+        - name: BACKEND_SERVER
+          value: "$backend_server"
+        - name: NODE_ENV
+          value: "production"
+        - name: VERSION
+          value: "$tag"
+        - name: CONFIG_PATH
+          value: "/app/config"
+        resources:
+          requests:
+            memory: "$memory_request"
+            cpu: "$cpu_request"
+          limits:
+            memory: "$memory_limit"
+            cpu: "$cpu_limit"
+$LIVENESS_PROBE
+$READINESS_PROBE
+        imagePullPolicy: Always
+    fi
+
+    # 继续添加Service和Ingress配置
+    cat >> "$ack_deployment_file" << EOF
 ---
 apiVersion: v1
 kind: Service
