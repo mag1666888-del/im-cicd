@@ -35,18 +35,8 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 # 复制NGINX配置模板
 COPY deployment/nginx-template.conf /etc/nginx/conf.d/default.conf.template
 
-# 创建启动脚本
-RUN cat > /docker-entrypoint.d/nginx-config.sh << 'EOF'
-#!/bin/sh
-# 替换配置文件中的服务器IP
-if [ -n "$BACKEND_SERVER" ] && [ -n "$IM_SERVER" ]; then
-    sed -e "s/{{BACKEND_SERVER}}/$BACKEND_SERVER/g" \
-        -e "s/{{IM_SERVER}}/$IM_SERVER/g" \
-        /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
-else
-    cp /etc/nginx/conf.d/default.conf.template /etc/nginx/conf.d/default.conf
-fi
-EOF
+# 直接复制nginx配置，不使用环境变量替换
+RUN cp /etc/nginx/conf.d/default.conf.template /etc/nginx/conf.d/default.conf
 
 # 给脚本执行权限
 RUN chmod +x /docker-entrypoint.d/nginx-config.sh
