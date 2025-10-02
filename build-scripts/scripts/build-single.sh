@@ -35,7 +35,7 @@ generate_ack_deployment() {
     local LIVENESS_PROBE
     local READINESS_PROBE
     if [ "$project_name" = "im-cms" ]; then
-      LIVENESS_PROBE="        livenessProbe:
+      LIVENESS_PROBE="livenessProbe:
           httpGet:
             path: /
             port: $container_port
@@ -43,7 +43,7 @@ generate_ack_deployment() {
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3"
-      READINESS_PROBE="        readinessProbe:
+      READINESS_PROBE="readinessProbe:
           httpGet:
             path: /
             port: $container_port
@@ -52,14 +52,14 @@ generate_ack_deployment() {
           timeoutSeconds: 3
           failureThreshold: 3"
     else
-      LIVENESS_PROBE="        livenessProbe:
+      LIVENESS_PROBE="livenessProbe:
           tcpSocket:
             port: $container_port
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3"
-      READINESS_PROBE="        readinessProbe:
+      READINESS_PROBE="readinessProbe:
           tcpSocket:
             port: $container_port
           initialDelaySeconds: 5
