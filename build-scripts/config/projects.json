@@ -29,42 +29,12 @@
           "cpu": "500m"
         }
       }
-    },
-    "example-project": {
-      "name": "Example Project",
-      "description": "示例项目",
-      "git_url": "https://github.com/your-username/example-project.git",
-      "git_branch": "main",
-      "dockerfile_path": "Dockerfile",
-      "build_context": ".",
-      "dockerhub_repo": "your-username/example-project",
-      "backend_server": "192.168.1.100",
-      "ack_namespace": "default",
-      "ack_deployment": "example-project",
-      "ports": {
-        "container": 3000,
-        "host": 3000
-      },
-      "env_vars": {
-        "NODE_ENV": "production",
-        "PORT": "3000"
-      },
-      "resources": {
-        "requests": {
-          "memory": "128Mi",
-          "cpu": "100m"
-        },
-        "limits": {
-          "memory": "256Mi",
-          "cpu": "200m"
-        }
-      }
     }
   },
   "global": {
     "dockerhub_username": "mag1666888",
-    "ack_cluster_id": "your-cluster-id",
-    "ack_region": "cn-hangzhou",
+    "ack_cluster_id": "c2027cfa259e94c4a9f5846bd0012f089",
+    "ack_region": "ap-southeast-1",
     "log_level": "info",
     "build_timeout": 1800,
     "deploy_timeout": 300
