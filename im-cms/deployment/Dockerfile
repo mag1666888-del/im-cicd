@@ -38,9 +38,6 @@ COPY deployment/nginx-template.conf /etc/nginx/conf.d/default.conf.template
 # 直接复制nginx配置，不使用环境变量替换
 RUN cp /etc/nginx/conf.d/default.conf.template /etc/nginx/conf.d/default.conf
 
-# 给脚本执行权限
-RUN chmod +x /docker-entrypoint.d/nginx-config.sh
-
 # 暴露端口
 EXPOSE 80 443
 
