@@ -78,7 +78,7 @@ metadata:
   namespace: default
 data:
   discovery.yml: |
-    enable: "kubernetes"
+    enable: "etcd"
     kubernetes:
       namespace: default
     etcd:
