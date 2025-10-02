@@ -74,7 +74,7 @@ generate_ack_deployment() {
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: $ack_deployment-config
+  name: my-open-im-config
   namespace: $ack_namespace
 data:
   discovery.yml: |
@@ -117,6 +117,32 @@ data:
     db: 0
     poolSize: 30
     minIdleConns: 10
+
+  local-cache.yml: |
+    user:
+      topic: DELETE_CACHE_USER
+      slotNum: 100
+      slotSize: 2000
+      successExpire: 300
+      failedExpire: 5
+    group:
+      topic: DELETE_CACHE_GROUP
+      slotNum: 100
+      slotSize: 2000
+      successExpire: 300
+      failedExpire: 5
+    friend:
+      topic: DELETE_CACHE_FRIEND
+      slotNum: 100
+      slotSize: 2000
+      successExpire: 300
+      failedExpire: 5
+    conversation:
+      topic: DELETE_CACHE_CONVERSATION
+      slotNum: 100
+      slotSize: 2000
+      successExpire: 300
+      failedExpire: 5
 
   kafka.yml: |
     username: ''
@@ -177,10 +203,10 @@ spec:
         - name: VERSION
           value: "$tag"
         - name: CONFIG_PATH
-          value: "/app/config"
+          value: "/config"
         volumeMounts:
         - name: config-volume
-          mountPath: "/app/config"
+          mountPath: "/config"
           readOnly: true
         resources:
           requests:
@@ -195,7 +221,7 @@ spec:
       volumes:
       - name: config-volume
         configMap:
-          name: $ack_deployment-config
+          name: my-open-im-config
 EOF
     else
         # 其他项目使用原来的配置
