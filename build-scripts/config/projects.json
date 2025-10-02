@@ -90,17 +90,17 @@
         }
       }
     },
-    "build-scripts": {
-      "name": "Build Scripts",
+    "im-cicd": {
+      "name": "IM CICD",
       "description": "构建脚本和CI/CD工具",
-      "git_url": "git@github.com:mag1666888-del/build-scripts.git",
+      "git_url": "git@github.com:mag1666888-del/im-cicd.git",
       "git_branch": "main",
-      "dockerfile_path": "Dockerfile",
-      "build_context": ".",
-      "dockerhub_repo": "mag1666888/build-scripts",
+      "dockerfile_path": "build-scripts/Dockerfile",
+      "build_context": "build-scripts",
+      "dockerhub_repo": "mag1666888/im-cicd",
       "backend_server": "47.239.126.22",
       "ack_namespace": "default",
-      "ack_deployment": "build-scripts",
+      "ack_deployment": "im-cicd",
       "ports": {
         "container": 3000,
         "host": 3000
