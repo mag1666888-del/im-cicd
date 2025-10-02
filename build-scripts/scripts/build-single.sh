@@ -103,7 +103,9 @@ spec:
         - name: CONFIG_PATH
           value: "/app/config"
         - name: IMENV_DISCOVERY_ENABLE
-          value: "standalone"
+          value: "etcd"
+        - name: IMENV_DISCOVERY_ETCD_ADDR
+          value: "etcd-service.etcd.svc.cluster.local:2379"
         resources:
           requests:
             memory: "$memory_request"
