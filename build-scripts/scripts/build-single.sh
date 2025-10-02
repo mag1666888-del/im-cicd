@@ -102,6 +102,8 @@ spec:
           value: "$tag"
         - name: CONFIG_PATH
           value: "/app/config"
+        - name: IMENV_DISCOVERY_ENABLE
+          value: "standalone"
         resources:
           requests:
             memory: "$memory_request"
