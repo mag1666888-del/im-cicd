@@ -1,19 +1,109 @@
 {
   "projects": {
-    "openim-cms": {
-      "name": "OpenIM CMS",
-      "description": "企业级聊天管理系统",
-      "git_url": "git@github.com:mag1666888-del/im-cicd.git",
+    "im-cms": {
+      "name": "IM CMS Frontend",
+      "description": "企业级聊天管理系统前端",
+      "git_url": "git@github.com:mag1666888-del/im-cms.git",
       "git_branch": "main",
-      "dockerfile_path": "im-cms/deployment/Dockerfile",
-      "build_context": "im-cms",
-      "dockerhub_repo": "mag1666888/openim-cms",
+      "dockerfile_path": "deployment/Dockerfile",
+      "build_context": ".",
+      "dockerhub_repo": "mag1666888/im-cms",
       "backend_server": "47.239.126.22",
       "ack_namespace": "default",
-      "ack_deployment": "openim-cms",
+      "ack_deployment": "im-cms",
       "ports": {
         "container": 80,
         "host": 80
+      },
+      "env_vars": {
+        "NODE_ENV": "production",
+        "BACKEND_SERVER": "47.239.126.22"
+      },
+      "resources": {
+        "requests": {
+          "memory": "256Mi",
+          "cpu": "250m"
+        },
+        "limits": {
+          "memory": "512Mi",
+          "cpu": "500m"
+        }
+      }
+    },
+    "chat": {
+      "name": "Chat Service",
+      "description": "聊天服务后端",
+      "git_url": "git@github.com:mag1666888-del/chat.git",
+      "git_branch": "main",
+      "dockerfile_path": "Dockerfile",
+      "build_context": ".",
+      "dockerhub_repo": "mag1666888/chat",
+      "backend_server": "47.239.126.22",
+      "ack_namespace": "default",
+      "ack_deployment": "chat",
+      "ports": {
+        "container": 8080,
+        "host": 8080
+      },
+      "env_vars": {
+        "NODE_ENV": "production",
+        "BACKEND_SERVER": "47.239.126.22"
+      },
+      "resources": {
+        "requests": {
+          "memory": "512Mi",
+          "cpu": "500m"
+        },
+        "limits": {
+          "memory": "1Gi",
+          "cpu": "1000m"
+        }
+      }
+    },
+    "open-im-server": {
+      "name": "OpenIM Server",
+      "description": "OpenIM服务器",
+      "git_url": "git@github.com:mag1666888-del/open-im-server.git",
+      "git_branch": "main",
+      "dockerfile_path": "Dockerfile",
+      "build_context": ".",
+      "dockerhub_repo": "mag1666888/open-im-server",
+      "backend_server": "47.239.126.22",
+      "ack_namespace": "default",
+      "ack_deployment": "open-im-server",
+      "ports": {
+        "container": 10001,
+        "host": 10001
+      },
+      "env_vars": {
+        "NODE_ENV": "production",
+        "BACKEND_SERVER": "47.239.126.22"
+      },
+      "resources": {
+        "requests": {
+          "memory": "1Gi",
+          "cpu": "1000m"
+        },
+        "limits": {
+          "memory": "2Gi",
+          "cpu": "2000m"
+        }
+      }
+    },
+    "build-scripts": {
+      "name": "Build Scripts",
+      "description": "构建脚本和CI/CD工具",
+      "git_url": "git@github.com:mag1666888-del/build-scripts.git",
+      "git_branch": "main",
+      "dockerfile_path": "Dockerfile",
+      "build_context": ".",
+      "dockerhub_repo": "mag1666888/build-scripts",
+      "backend_server": "47.239.126.22",
+      "ack_namespace": "default",
+      "ack_deployment": "build-scripts",
+      "ports": {
+        "container": 3000,
+        "host": 3000
       },
       "env_vars": {
         "NODE_ENV": "production",
