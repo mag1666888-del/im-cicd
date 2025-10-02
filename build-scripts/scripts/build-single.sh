@@ -78,12 +78,12 @@ metadata:
   namespace: default
 data:
   discovery.yml: |
-    enable: "standalone"
+    enable: "etcd"
     kubernetes:
       namespace: default
     etcd:
       rootDirectory: openim
-      address: [ "etcd.openim-infrastructure.svc.cluster.local:2379" ]
+      address: [ "etcd.default.svc.cluster.local:2379" ]
       username: ''
       password: ''
     rpcService:
