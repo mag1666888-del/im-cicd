@@ -38,7 +38,7 @@ sed -i 's/{{SERVER_IP}}/chat-service.default.svc.cluster.local:8080/g' nginx-ope
 
 **如果使用完整配置文件**：
 ```bash
-# 将 47.239.126.22 替换为实际IP地址
+# 将 xxxxx 替换为实际IP地址
 sed -i 's/chat-service.default.svc.cluster.local:8080/你的服务器IP/g' nginx-openim.conf
 ```
 
