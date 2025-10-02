@@ -106,6 +106,8 @@ spec:
           value: "etcd"
         - name: IMENV_DISCOVERY_ETCD_ADDRESS
           value: "etcd.openim-infrastructure.svc.cluster.local:2379"
+        - name: DEPLOYMENT_TYPE
+          value: "standalone"
         - name: IMENV_MONGODB_ADDRESS
           value: "mongodb.openim-infrastructure.svc.cluster.local:27017"
         - name: IMENV_MONGODB_USERNAME
