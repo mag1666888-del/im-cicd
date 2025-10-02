@@ -75,15 +75,15 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: my-open-im-config
-  namespace: $ack_namespace
+  namespace: default
 data:
   discovery.yml: |
     enable: "kubernetes"
     kubernetes:
-      namespace: $ack_namespace
+      namespace: default
     etcd:
       rootDirectory: openim
-      address: [ localhost:12379 ]
+      address: [ "etcd.openim-infrastructure.svc.cluster.local:2379" ]
       username: ''
       password: ''
     rpcService:
@@ -228,7 +228,7 @@ data:
       listenIP: 0.0.0.0
       ports: [ 8080 ]
 
-  my-open-im-api.yml: |
+  openim-api.yml: |
     api:
       listenIP: 0.0.0.0
       ports: [ 10002 ]
@@ -238,7 +238,7 @@ data:
       ports: [ 12002 ]
       grafanaURL: http://127.0.0.1:13000/
 
-  my-open-im-rpc-auth.yml: |
+  openim-rpc-auth.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -250,7 +250,7 @@ data:
     tokenPolicy:
       expire: 90
 
-  my-open-im-rpc-user.yml: |
+  openim-rpc-user.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -260,7 +260,7 @@ data:
       enable: true
       ports: [ 12320 ]
 
-  my-open-im-rpc-friend.yml: |
+  openim-rpc-friend.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -270,7 +270,7 @@ data:
       enable: true
       ports: [ 12240 ]
 
-  my-open-im-rpc-group.yml: |
+  openim-rpc-group.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -281,7 +281,7 @@ data:
       ports: [ 12260 ]
     enableHistoryForNewMembers: true
 
-  my-open-im-rpc-msg.yml: |
+  openim-rpc-msg.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -291,7 +291,7 @@ data:
       enable: true
       ports: [ 12280 ]
 
-  my-open-im-rpc-conversation.yml: |
+  openim-rpc-conversation.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -303,7 +303,7 @@ data:
     tokenPolicy:
       expire: 90
 
-  my-open-im-rpc-third.yml: |
+  openim-rpc-third.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -313,7 +313,7 @@ data:
       enable: true
       ports: [ 12300 ]
 
-  my-open-im-msggateway.yml: |
+  openim-msggateway.yml: |
     rpc:
       registerIP: 
       autoSetPorts: false
@@ -328,12 +328,12 @@ data:
       websocketMaxMsgLen: 4096
       websocketTimeout: 10
 
-  my-open-im-msgtransfer.yml: |
+  openim-msgtransfer.yml: |
     prometheus:
       enable: true
       ports: [ 12020 ]
 
-  my-open-im-push.yml: |
+  openim-push.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
@@ -365,7 +365,7 @@ data:
       production: false
     fullUserCache: true
 
-  my-open-im-crontask.yml: |
+  openim-crontask.yml: |
     cronExecuteTime: 0 2 * * *
     retainChatRecords: 365
     fileExpireTime: 180
@@ -567,7 +567,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: $ack_deployment
-  namespace: $ack_namespace
+  namespace: default
   labels:
     app: $ack_deployment
     version: $tag
@@ -622,7 +622,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: $ack_deployment
-  namespace: $ack_namespace
+  namespace: default
   labels:
     app: $ack_deployment
     version: $tag
@@ -671,7 +671,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: $ack_deployment-service
-  namespace: $ack_namespace
+  namespace: default
   labels:
     app: $ack_deployment
 spec:
@@ -687,7 +687,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: $ack_deployment-ingress
-  namespace: $ack_namespace
+  namespace: default
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
