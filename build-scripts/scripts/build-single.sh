@@ -70,7 +70,7 @@ generate_ack_deployment() {
 
     # 为open-im-server和chat创建ConfigMap
     if [[ "$project_name" == "open-im-server" || "$project_name" == "chat" ]]; then
-        cat > "$ack_deployment_file" << EOF
+        cat > "$ack_deployment_file" << 'EOF'
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -196,10 +196,10 @@ $READINESS_PROBE
       - name: config-volume
         configMap:
           name: $ack_deployment-config
-    fi
+EOF
     else
         # 其他项目使用原来的配置
-        cat > "$ack_deployment_file" << EOF
+        cat > "$ack_deployment_file" << 'EOF'
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -243,10 +243,11 @@ spec:
 $LIVENESS_PROBE
 $READINESS_PROBE
         imagePullPolicy: Always
+EOF
     fi
 
     # 继续添加Service和Ingress配置
-    cat >> "$ack_deployment_file" << EOF
+    cat >> "$ack_deployment_file" << 'EOF'
 ---
 apiVersion: v1
 kind: Service
