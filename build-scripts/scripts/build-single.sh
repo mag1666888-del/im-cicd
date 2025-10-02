@@ -35,11 +35,37 @@ generate_ack_deployment() {
     local LIVENESS_PROBE
     local READINESS_PROBE
     if [ "$project_name" = "im-cms" ]; then
-      LIVENESS_PROBE="        livenessProbe:\n          httpGet:\n            path: /\n            port: $container_port\n          initialDelaySeconds: 30\n          periodSeconds: 10\n          timeoutSeconds: 5\n          failureThreshold: 3"
-      READINESS_PROBE="        readinessProbe:\n          httpGet:\n            path: /\n            port: $container_port\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 3\n          failureThreshold: 3"
+      LIVENESS_PROBE="        livenessProbe:
+          httpGet:
+            path: /
+            port: $container_port
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3"
+      READINESS_PROBE="        readinessProbe:
+          httpGet:
+            path: /
+            port: $container_port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3"
     else
-      LIVENESS_PROBE="        livenessProbe:\n          tcpSocket:\n            port: $container_port\n          initialDelaySeconds: 30\n          periodSeconds: 10\n          timeoutSeconds: 5\n          failureThreshold: 3"
-      READINESS_PROBE="        readinessProbe:\n          tcpSocket:\n            port: $container_port\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 3\n          failureThreshold: 3"
+      LIVENESS_PROBE="        livenessProbe:
+          tcpSocket:
+            port: $container_port
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3"
+      READINESS_PROBE="        readinessProbe:
+          tcpSocket:
+            port: $container_port
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3"
     fi
 
     cat > "$ack_deployment_file" << EOF
@@ -81,8 +107,8 @@ spec:
           limits:
             memory: "$memory_limit"
             cpu: "$cpu_limit"
-${LIVENESS_PROBE}
-${READINESS_PROBE}
+$LIVENESS_PROBE
+$READINESS_PROBE
         imagePullPolicy: Always
 ---
 apiVersion: v1
