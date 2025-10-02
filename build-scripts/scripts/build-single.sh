@@ -31,6 +31,17 @@ generate_ack_deployment() {
     local memory_limit=$(get_project_config "$project_name" "resources.limits.memory")
     local cpu_limit=$(get_project_config "$project_name" "resources.limits.cpu")
     
+    # 根据项目类型生成探针配置
+    local LIVENESS_PROBE
+    local READINESS_PROBE
+    if [ "$project_name" = "im-cms" ]; then
+      LIVENESS_PROBE="        livenessProbe:\n          httpGet:\n            path: /\n            port: $container_port\n          initialDelaySeconds: 30\n          periodSeconds: 10\n          timeoutSeconds: 5\n          failureThreshold: 3"
+      READINESS_PROBE="        readinessProbe:\n          httpGet:\n            path: /\n            port: $container_port\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 3\n          failureThreshold: 3"
+    else
+      LIVENESS_PROBE="        livenessProbe:\n          tcpSocket:\n            port: $container_port\n          initialDelaySeconds: 30\n          periodSeconds: 10\n          timeoutSeconds: 5\n          failureThreshold: 3"
+      READINESS_PROBE="        readinessProbe:\n          tcpSocket:\n            port: $container_port\n          initialDelaySeconds: 5\n          periodSeconds: 5\n          timeoutSeconds: 3\n          failureThreshold: 3"
+    fi
+
     cat > "$ack_deployment_file" << EOF
 apiVersion: apps/v1
 kind: Deployment
@@ -70,22 +81,8 @@ spec:
           limits:
             memory: "$memory_limit"
             cpu: "$cpu_limit"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: $container_port
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /
-            port: $container_port
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+${LIVENESS_PROBE}
+${READINESS_PROBE}
         imagePullPolicy: Always
 ---
 apiVersion: v1
