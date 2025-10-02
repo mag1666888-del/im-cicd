@@ -78,7 +78,7 @@ metadata:
   namespace: default
 data:
   discovery.yml: |
-    enable: "etcd"
+    enable: "kubernetes"
     kubernetes:
       namespace: default
     etcd:
@@ -87,18 +87,18 @@ data:
       username: ''
       password: ''
     rpcService:
-      user: user-rpc-service
-      friend: friend-rpc-service
-      msg: msg-rpc-service
-      push: push-rpc-service
-      messageGateway: messagegateway-rpc-service
-      group: group-rpc-service
-      auth: auth-rpc-service
-      conversation: conversation-rpc-service
-      third: third-rpc-service
-      chat: my-chat-rpc-service
-      admin: admin-rpc-service
-      bot: bot-rpc-service
+      user: openim-rpc-user
+      friend: openim-rpc-friend
+      msg: openim-rpc-msg
+      push: openim-push
+      messageGateway: openim-msggateway
+      group: openim-rpc-group
+      auth: openim-rpc-auth
+      conversation: openim-rpc-conversation
+      third: openim-rpc-third
+      chat: openim-chat-rpc
+      admin: openim-admin-rpc
+      bot: openim-bot-rpc
 
   log.yml: |
     storageLocation: ./logs/
@@ -596,8 +596,6 @@ spec:
           value: "$tag"
         - name: CONFIG_PATH
           value: "/config"
-        - name: RUNTIME_ENV
-          value: "standalone"
         volumeMounts:
         - name: config-volume
           mountPath: "/config"
@@ -653,8 +651,6 @@ spec:
           value: "$tag"
         - name: CONFIG_PATH
           value: "/app/config"
-        - name: RUNTIME_ENV
-          value: "standalone"
         resources:
           requests:
             memory: "$memory_request"
