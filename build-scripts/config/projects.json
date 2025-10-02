@@ -8,7 +8,7 @@
       "dockerfile_path": "deployment/Dockerfile",
       "build_context": ".",
       "dockerhub_repo": "mag1666888/im-cms",
-      "backend_server": "47.239.126.22",
+      "backend_server": "chat-service.default.svc.cluster.local:8080",
       "ack_namespace": "default",
       "ack_deployment": "im-cms",
       "ports": {
@@ -17,7 +17,7 @@
       },
       "env_vars": {
         "NODE_ENV": "production",
-        "BACKEND_SERVER": "47.239.126.22"
+        "BACKEND_SERVER": "chat-service.default.svc.cluster.local:8080"
       },
       "resources": {
         "requests": {
@@ -38,7 +38,7 @@
       "dockerfile_path": "Dockerfile",
       "build_context": ".",
       "dockerhub_repo": "mag1666888/chat",
-      "backend_server": "47.239.126.22",
+      "backend_server": "chat-service.default.svc.cluster.local:8080",
       "ack_namespace": "default",
       "ack_deployment": "chat",
       "ports": {
@@ -47,7 +47,7 @@
       },
       "env_vars": {
         "NODE_ENV": "production",
-        "BACKEND_SERVER": "47.239.126.22"
+        "BACKEND_SERVER": "chat-service.default.svc.cluster.local:8080"
       },
       "resources": {
         "requests": {
@@ -68,7 +68,7 @@
       "dockerfile_path": "Dockerfile",
       "build_context": ".",
       "dockerhub_repo": "mag1666888/open-im-server",
-      "backend_server": "47.239.126.22",
+      "backend_server": "chat-service.default.svc.cluster.local:8080",
       "ack_namespace": "default",
       "ack_deployment": "open-im-server",
       "ports": {
@@ -77,7 +77,7 @@
       },
       "env_vars": {
         "NODE_ENV": "production",
-        "BACKEND_SERVER": "47.239.126.22"
+        "BACKEND_SERVER": "chat-service.default.svc.cluster.local:8080"
       },
       "resources": {
         "requests": {
@@ -98,7 +98,7 @@
       "dockerfile_path": "build-scripts/Dockerfile",
       "build_context": "build-scripts",
       "dockerhub_repo": "mag1666888/im-cicd",
-      "backend_server": "47.239.126.22",
+      "backend_server": "chat-service.default.svc.cluster.local:8080",
       "ack_namespace": "default",
       "ack_deployment": "im-cicd",
       "ports": {
@@ -107,7 +107,7 @@
       },
       "env_vars": {
         "NODE_ENV": "production",
-        "BACKEND_SERVER": "47.239.126.22"
+        "BACKEND_SERVER": "chat-service.default.svc.cluster.local:8080"
       },
       "resources": {
         "requests": {
