@@ -13,7 +13,7 @@ services:
       - ./ssl:/etc/nginx/ssl:ro  # SSL证书目录
       - ./logs/nginx:/var/log/nginx  # 日志目录
     environment:
-      - BACKEND_SERVER=${BACKEND_SERVER:-47.239.126.22}
+      - BACKEND_SERVER=${BACKEND_SERVER:-chat-service.default.svc.cluster.local:8080}
       - NODE_ENV=production
     restart: unless-stopped
     networks:

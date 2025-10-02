@@ -43,7 +43,7 @@ show_help() {
     echo "  docker     Docker部署"
     echo ""
     echo "选项:"
-    echo "  -s, --server IP     后端服务器IP地址 (默认: 47.239.126.22)"
+    echo "  -s, --server IP     后端服务器IP地址 (默认: chat-service.default.svc.cluster.local:8080)"
     echo "  -e, --env ENV       环境名称 (默认: production)"
     echo "  -d, --domain DOMAIN 域名 (可选)"
     echo "  -h, --help          显示帮助信息"
@@ -263,7 +263,7 @@ deploy_docker() {
 # 主函数
 main() {
     local deploy_type=""
-    local server_ip="47.239.126.22"
+    local server_ip="chat-service.default.svc.cluster.local:8080"
     local environment="production"
     local domain=""
     

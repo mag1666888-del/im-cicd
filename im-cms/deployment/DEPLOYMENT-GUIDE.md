@@ -574,7 +574,7 @@ services:
 
 **必需配置**：
 ```bash
-BACKEND_SERVER=47.239.126.22  # 后端服务器IP
+BACKEND_SERVER=chat-service.default.svc.cluster.local:8080  # 后端服务器IP
 NODE_ENV=production           # 环境标识
 ```
 

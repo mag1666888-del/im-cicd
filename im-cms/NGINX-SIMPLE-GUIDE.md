@@ -33,13 +33,13 @@ cp nginx.conf nginx-openim.conf
 **如果使用模板文件**：
 ```bash
 # 将 {{SERVER_IP}} 替换为实际IP地址
-sed -i 's/{{SERVER_IP}}/47.239.126.22/g' nginx-openim.conf
+sed -i 's/{{SERVER_IP}}/chat-service.default.svc.cluster.local:8080/g' nginx-openim.conf
 ```
 
 **如果使用完整配置文件**：
 ```bash
 # 将 47.239.126.22 替换为实际IP地址
-sed -i 's/47.239.126.22/你的服务器IP/g' nginx-openim.conf
+sed -i 's/chat-service.default.svc.cluster.local:8080/你的服务器IP/g' nginx-openim.conf
 ```
 
 ### 步骤3：部署到NGINX
@@ -81,7 +81,7 @@ sudo systemctl reload nginx
 ### 开发环境
 ```bash
 # 使用开发服务器IP
-sed -i 's/{{SERVER_IP}}/47.239.126.22/g' nginx-openim.conf
+sed -i 's/{{SERVER_IP}}/chat-service.default.svc.cluster.local:8080/g' nginx-openim.conf
 ```
 
 ### 测试环境

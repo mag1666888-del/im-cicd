@@ -59,7 +59,7 @@ cp config/env.example .env
       "dockerfile_path": "im-cms/deployment/Dockerfile",
       "build_context": "im-cms",
       "dockerhub_repo": "your-username/openim-cms",
-      "backend_server": "47.239.126.22",
+      "backend_server": "chat-service.default.svc.cluster.local:8080",
       "ack_namespace": "default",
       "ack_deployment": "openim-cms"
     }
