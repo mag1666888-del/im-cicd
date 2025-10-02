@@ -39,8 +39,10 @@ COPY deployment/nginx-template.conf /etc/nginx/conf.d/default.conf.template
 RUN cat > /docker-entrypoint.d/nginx-config.sh << 'EOF'
 #!/bin/sh
 # 替换配置文件中的服务器IP
-if [ -n "$BACKEND_SERVER" ]; then
-    sed "s/{{SERVER_IP}}/$BACKEND_SERVER/g" /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
+if [ -n "$BACKEND_SERVER" ] && [ -n "$IM_SERVER" ]; then
+    sed -e "s/{{BACKEND_SERVER}}/$BACKEND_SERVER/g" \
+        -e "s/{{IM_SERVER}}/$IM_SERVER/g" \
+        /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 else
     cp /etc/nginx/conf.d/default.conf.template /etc/nginx/conf.d/default.conf
 fi
