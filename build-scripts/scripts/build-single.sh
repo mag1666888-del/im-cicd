@@ -170,6 +170,146 @@ data:
     signEndpoint: 'minio.openim-infrastructure.svc.cluster.local:9000'
     bucket: 'openim'
 
+  share.yml: |
+    openIM:
+      apiURL: http://open-im-server-service.default.svc.cluster.local:10001
+      secret: openIM123
+      adminUserID: imAdmin
+      tokenRefreshInterval: 120
+    chatAdmin:
+      - "chatAdmin"
+
+  chat-api-chat.yml: |
+    api:
+      listenIP: 0.0.0.0
+      ports: [ 8080 ]
+
+  openim-api.yml: |
+    api:
+      listenIP: 0.0.0.0
+      ports: [ 10001 ]
+      compressionLevel: 0
+    prometheus:
+      enable: true
+      autoSetPorts: true
+      ports:
+      grafanaURL:
+
+  openim-rpc-auth.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+    tokenPolicy:
+      expire: 90
+
+  openim-rpc-user.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-rpc-friend.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-rpc-group.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-rpc-msg.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-rpc-conversation.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-rpc-third.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-msggateway.yml: |
+    longConnSvr:
+      listenIP: 0.0.0.0
+      wsPort: [ 10001 ]
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-msgtransfer.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-push.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
+  openim-crontask.yml: |
+    rpc:
+      registerIP: 
+      listenIP: 0.0.0.0
+      autoSetPorts: true
+      ports:
+    prometheus:
+      enable: true
+      ports:
+
 ---
 apiVersion: apps/v1
 kind: Deployment
