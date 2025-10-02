@@ -32,11 +32,8 @@ RUN apk add --no-cache gettext curl
 # 复制构建产物
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# 复制NGINX配置模板
-COPY deployment/nginx-template.conf /etc/nginx/conf.d/default.conf.template
-
-# 直接复制nginx配置，不使用环境变量替换
-RUN cp /etc/nginx/conf.d/default.conf.template /etc/nginx/conf.d/default.conf
+# 直接复制nginx配置文件，不使用模板
+COPY deployment/nginx-template.conf /etc/nginx/conf.d/default.conf
 
 # 暴露端口
 EXPOSE 80 443
