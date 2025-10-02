@@ -196,6 +196,7 @@ $READINESS_PROBE
       - name: config-volume
         configMap:
           name: $ack_deployment-config
+    fi
     else
         # 其他项目使用原来的配置
         cat > "$ack_deployment_file" << EOF
