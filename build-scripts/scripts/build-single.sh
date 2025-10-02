@@ -120,11 +120,13 @@ data:
     maxRetry: 10
 
   redis.yml: |
-    address: [ redis.openim-infrastructure.svc.cluster.local:6379 ]
-    password: 'openIM123'
+    address: [ "redis.openim-infrastructure.svc.cluster.local:6379" ]
+    username:
+    password: openIM123
+    clusterMode: false
     db: 0
-    poolSize: 30
-    minIdleConns: 10
+    maxRetry: 10
+    poolSize: 100
 
   local-cache.yml: |
     user:
@@ -155,6 +157,17 @@ data:
   kafka.yml: |
     username: ''
     password: ''
+    producerAck:
+    compressType: none
+    address: [ "kafka.openim-infrastructure.svc.cluster.local:9094" ]
+    toRedisTopic: toRedis
+    toMongoTopic: toMongo
+    toPushTopic: toPush
+    toOfflinePushTopic: toOfflinePush
+    toRedisGroupID: redis
+    toMongoGroupID: mongo
+    toPushGroupID: push
+    toOfflinePushGroupID: offlinePush
     latestMsgToRedis:
       topic: 'latestMsgToRedis'
     offlineMsgToMongo:
@@ -168,15 +181,16 @@ data:
       offlineMsgToMongo: 'offlineMsgToMongo'
       msgToPush: 'msgToPush'
       msgToModify: 'msgToModify'
-    addr: [ kafka.openim-infrastructure.svc.cluster.local:9094 ]
+    addr: [ "kafka.openim-infrastructure.svc.cluster.local:9094" ]
 
   minio.yml: |
-    endpoint: 'minio.openim-infrastructure.svc.cluster.local:9000'
-    accessKeyID: 'root'
-    secretAccessKey: 'openIM123'
-    useSSL: false
-    signEndpoint: 'minio.openim-infrastructure.svc.cluster.local:9000'
-    bucket: 'openim'
+    bucket: openim
+    accessKeyID: root
+    secretAccessKey: openIM123
+    sessionToken:
+    internalAddress: minio.openim-infrastructure.svc.cluster.local:9000
+    externalAddress: http://minio.openim-infrastructure.svc.cluster.local:9000
+    publicRead: "false"
 
   share.yml: |
     openIM:
@@ -187,136 +201,175 @@ data:
     chatAdmin:
       - "chatAdmin"
 
+  notification.yml: |
+    groupCreated:
+      isSendMsg: true
+    reliabilityLevel: 1
+    isSendMsg: true
+    isOfflinePush: true
+    isOnlinePush: true
+    isHistory: true
+    isUnreadCount: true
+    offlinePush:
+      title: "you have a new message"
+      desc: "desc"
+      ex: "ex"
+      iOSPushSound: "default"
+      iOSBadgeCount: true
+    onlinePush:
+      title: "title"
+      desc: "desc"
+      ex: "ex"
+      iOSPushSound: "default"
+      iOSBadgeCount: true
+
   chat-api-chat.yml: |
     api:
       listenIP: 0.0.0.0
       ports: [ 8080 ]
 
-  openim-api.yml: |
+  my-open-im-api.yml: |
     api:
       listenIP: 0.0.0.0
-      ports: [ 10001 ]
+      ports: [ 10002 ]
       compressionLevel: 0
     prometheus:
       enable: true
-      autoSetPorts: true
-      ports:
-      grafanaURL:
+      ports: [ 12002 ]
+      grafanaURL: http://127.0.0.1:13000/
 
-  openim-rpc-auth.yml: |
+  my-open-im-rpc-auth.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10200 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12200 ]
     tokenPolicy:
       expire: 90
 
-  openim-rpc-user.yml: |
+  my-open-im-rpc-user.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10320 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12320 ]
 
-  openim-rpc-friend.yml: |
+  my-open-im-rpc-friend.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10240 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12240 ]
 
-  openim-rpc-group.yml: |
+  my-open-im-rpc-group.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10260 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12260 ]
+    enableHistoryForNewMembers: true
 
-  openim-rpc-msg.yml: |
+  my-open-im-rpc-msg.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10280 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12280 ]
 
-  openim-rpc-conversation.yml: |
+  my-open-im-rpc-conversation.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10220 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12220 ]
+    tokenPolicy:
+      expire: 90
 
-  openim-rpc-third.yml: |
+  my-open-im-rpc-third.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10300 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12300 ]
 
-  openim-msggateway.yml: |
+  my-open-im-msggateway.yml: |
+    rpc:
+      registerIP: 
+      autoSetPorts: false
+      ports: [ 10140 ]
+    prometheus:
+      enable: true
+      ports: [ 12140 ]
+    listenIP: 0.0.0.0
     longConnSvr:
-      listenIP: 0.0.0.0
-      wsPort: [ 10001 ]
-    rpc:
-      registerIP: 
-      listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
-    prometheus:
-      enable: true
-      ports:
+      ports: [ 10001 ]
+      websocketMaxConnNum: 100000
+      websocketMaxMsgLen: 4096
+      websocketTimeout: 10
 
-  openim-msgtransfer.yml: |
-    rpc:
-      registerIP: 
-      listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+  my-open-im-msgtransfer.yml: |
     prometheus:
       enable: true
-      ports:
+      ports: [ 12020 ]
 
-  openim-push.yml: |
+  my-open-im-push.yml: |
     rpc:
       registerIP: 
       listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
+      autoSetPorts: false
+      ports: [ 10170 ]
     prometheus:
       enable: true
-      ports:
+      ports: [ 12170 ]
+    maxConcurrentWorkers: 3
+    enable:
+    geTui:
+      pushUrl: https://restapi.getui.com/v2/$appId
+      masterSecret:
+      appKey:
+      intent:
+      channelID:
+      channelName:
+    fcm:
+      filePath:
+      authURL:
+    jpush:
+      appKey:
+      masterSecret:
+      pushURL:
+      pushIntent:
+    iosPush:
+      pushSound: xxx
+      badgeCount: true
+      production: false
+    fullUserCache: true
 
-  openim-crontask.yml: |
-    rpc:
-      registerIP: 
-      listenIP: 0.0.0.0
-      autoSetPorts: true
-      ports:
-    prometheus:
-      enable: true
-      ports:
+  my-open-im-crontask.yml: |
+    cronExecuteTime: 0 2 * * *
+    retainChatRecords: 365
+    fileExpireTime: 180
+    deleteObjectType: ["msg-picture","msg-file", "msg-voice","msg-video","msg-video-snapshot","sdklog"]
 
   webhooks.yml: |
     url: http://127.0.0.1:10006/callbackExample
