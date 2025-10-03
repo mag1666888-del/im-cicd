@@ -248,6 +248,13 @@ data:
     prometheus:
       enable: true
       ports: [ 12170 ]
+  
+  webhooks.yml: |
+    url: ""
+    beforeSendSingleMsg:
+      enable: false
+    beforeSendGroupMsg:
+      enable: false
 EOF
 
 echo "[STEP] 应用 OpenIM Server 与 Chat 的 Service/Deployment（使用仓库自带清单）"
