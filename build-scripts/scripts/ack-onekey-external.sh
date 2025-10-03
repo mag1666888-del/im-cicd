@@ -253,9 +253,12 @@ EOF
 echo "[STEP] 应用 OpenIM Server 与 Chat 的 Service/Deployment（使用仓库自带清单）"
 # 以脚本所在位置为基准定位仓库根目录（…/build-scripts/scripts → 仓库根）
 BASE=${BASE:-$(cd "$(dirname "$0")/../.." && pwd)}
-# 也支持通过环境变量覆盖清单目录
-OIS_MANIFEST_DIR=${OIS_MANIFEST_DIR:-"$BASE/open-im-server/deployments/deploy"}
-CHAT_MANIFEST_DIR=${CHAT_MANIFEST_DIR:-"$BASE/chat/deployments/deploy"}
+# 服务器默认目录（可通过环境变量覆盖）
+OIS_MANIFEST_DIR=${OIS_MANIFEST_DIR:-"/home/im/open-im-server/deployments/deploy"}
+CHAT_MANIFEST_DIR=${CHAT_MANIFEST_DIR:-"/home/im/chat/deployments/deploy"}
+# 若上述目录不存在，则回退到仓库内相对路径
+if [ ! -d "$OIS_MANIFEST_DIR" ]; then OIS_MANIFEST_DIR="$BASE/open-im-server/deployments/deploy"; fi
+if [ ! -d "$CHAT_MANIFEST_DIR" ]; then CHAT_MANIFEST_DIR="$BASE/chat/deployments/deploy"; fi
 
 kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-api-service.yml"
 kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-api-deployment.yml"
