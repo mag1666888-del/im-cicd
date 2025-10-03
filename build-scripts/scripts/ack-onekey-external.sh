@@ -251,23 +251,28 @@ data:
 EOF
 
 echo "[STEP] 应用 OpenIM Server 与 Chat 的 Service/Deployment（使用仓库自带清单）"
-BASE=/Users/dalin/work/my-im-cicd
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-api-service.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-api-deployment.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-msggateway-service.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-msggateway-deployment.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-msgtransfer-service.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-msgtransfer-deployment.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-push-service.yml"
-kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-push-deployment.yml"
+# 以脚本所在位置为基准定位仓库根目录（…/build-scripts/scripts → 仓库根）
+BASE=${BASE:-$(cd "$(dirname "$0")/../.." && pwd)}
+# 也支持通过环境变量覆盖清单目录
+OIS_MANIFEST_DIR=${OIS_MANIFEST_DIR:-"$BASE/open-im-server/deployments/deploy"}
+CHAT_MANIFEST_DIR=${CHAT_MANIFEST_DIR:-"$BASE/chat/deployments/deploy"}
+
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-api-service.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-api-deployment.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-msggateway-service.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-msggateway-deployment.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-msgtransfer-service.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-msgtransfer-deployment.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-push-service.yml"
+kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-push-deployment.yml"
 
 for n in auth user friend group conversation third msg; do
-  kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-rpc-$n-service.yml"
-  kubectl apply -n "$NS" -f "$BASE/open-im-server/deployments/deploy/openim-rpc-$n-deployment.yml"
+  kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-rpc-$n-service.yml"
+  kubectl apply -n "$NS" -f "$OIS_MANIFEST_DIR/openim-rpc-$n-deployment.yml"
 done
 
-kubectl apply -n "$NS" -f "$BASE/chat/deployments/deploy/openim-chat-api-service.yml"
-kubectl apply -n "$NS" -f "$BASE/chat/deployments/deploy/openim-chat-api-deployment.yml"
+kubectl apply -n "$NS" -f "$CHAT_MANIFEST_DIR/openim-chat-api-service.yml"
+kubectl apply -n "$NS" -f "$CHAT_MANIFEST_DIR/openim-chat-api-deployment.yml"
 
 echo "[STEP] 将 Chat 的 ConfigMap 绑定到统一的 my-open-im-config（若其清单使用了 openim-my-chat-config）"
 kubectl patch deploy my-chat-api-server -n "$NS" -p '{"spec":{"template":{"spec":{"volumes":[{"name":"openim-my-chat-config","configMap":{"name":"my-open-im-config"}}]}}}}' || true
