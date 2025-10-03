@@ -76,6 +76,7 @@ build_push_ois openim-api          ./cmd/openim-api                 openim-api
 build_push_ois openim-msggateway   ./cmd/openim-msggateway          openim-msggateway
 build_push_ois openim-msgtransfer  ./cmd/openim-msgtransfer         openim-msgtransfer
 build_push_ois openim-push         ./cmd/openim-push                openim-push
+build_push_ois openim-crontask     ./cmd/openim-crontask            openim-crontask
 
 build_push_ois openim-rpc-auth         ./cmd/openim-rpc/openim-rpc-auth         openim-rpc-auth
 build_push_ois openim-rpc-user         ./cmd/openim-rpc/openim-rpc-user         openim-rpc-user
@@ -93,6 +94,7 @@ kubectl set image deploy/my-open-im-api                 my-open-im-api-container
 kubectl set image deploy/messagegateway-rpc-server      my-open-im-msggateway-container=$DOCKER_USER/openim-msggateway:$TAG -n $NAMESPACE
 kubectl set image deploy/my-open-im-msgtransfer-server  my-open-im-msgtransfer-server-container=$DOCKER_USER/openim-msgtransfer:$TAG -n $NAMESPACE
 kubectl set image deploy/push-rpc-server                push-rpc-server-container=$DOCKER_USER/openim-push:$TAG -n $NAMESPACE
+kubectl set image deploy/openim-crontask                crontask-container=$DOCKER_USER/openim-crontask:$TAG -n $NAMESPACE || true
 
 kubectl set image deploy/auth-rpc-server         auth-rpc-server-container=$DOCKER_USER/openim-rpc-auth:$TAG -n $NAMESPACE
 kubectl set image deploy/user-rpc-server         user-rpc-server-container=$DOCKER_USER/openim-rpc-user:$TAG -n $NAMESPACE
