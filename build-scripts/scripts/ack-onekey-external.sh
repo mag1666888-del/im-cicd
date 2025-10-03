@@ -249,6 +249,28 @@ data:
       enable: true
       ports: [ 12170 ]
   
+  notification.yml: |
+    groupCreated:
+      isSendMsg: true
+    reliabilityLevel: 1
+    isSendMsg: true
+    isOfflinePush: true
+    isOnlinePush: true
+    isHistory: true
+    isUnreadCount: true
+    offlinePush:
+      title: "you have a new message"
+      desc: "desc"
+      ex: "ex"
+      iOSPushSound: "default"
+      iOSBadgeCount: true
+    onlinePush:
+      title: "title"
+      desc: "desc"
+      ex: "ex"
+      iOSPushSound: "default"
+      iOSBadgeCount: true
+
   webhooks.yml: |
     url: ""
     beforeSendSingleMsg:
