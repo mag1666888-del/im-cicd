@@ -219,7 +219,7 @@ kubectl apply -f "$TEMP_DIR/mongo-secret.yml"
 
 # 6.2 更新 Chat 部署文件中的镜像标签
 echo "🔄 更新 Chat 镜像标签..."
-find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|image: .*chat|image: $DOCKER_USER/chat|g" {} \;
+find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|image: .*openim-chat|image: $DOCKER_USER/openim-chat|g" {} \;
 find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|:latest|:$TAG|g" {} \;
 
 # 6.3 部署 Chat 配置和服务
