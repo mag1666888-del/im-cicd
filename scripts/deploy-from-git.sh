@@ -164,20 +164,29 @@ kubectl apply -f "$TEMP_DIR/openim-api-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-api-service.yml"
 kubectl apply -f "$TEMP_DIR/openim-crontask-deployment.yml"
 
-echo "📄 部署用户相关组件..."
-# 先部署其他 RPC 服务，再部署 user-rpc（避免服务发现问题）
+echo "📄 部署 RPC 服务..."
+# 先部署所有 RPC 服务
+kubectl apply -f "$TEMP_DIR/openim-rpc-msg-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-msg-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-friend-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-friend-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-group-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-group-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-conversation-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-conversation-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-third-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-third-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-push-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-push-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-auth-deployment.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-auth-service.yml"
 
 # 等待其他 RPC 服务启动
 echo "⏳ 等待其他 RPC 服务启动..."
-sleep 10
+sleep 15
 
-# 最后部署 user-rpc
+# 最后部署 user-rpc（依赖其他 RPC 服务）
+echo "📄 部署用户相关组件..."
 kubectl apply -f "$TEMP_DIR/openim-rpc-user-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-user-service.yml"
 
@@ -291,14 +300,53 @@ kubectl get pods -n "$NS"
 kubectl get svc -n "$NS"
 kubectl get ingress -n "$NS"
 
-# 9. 清理临时文件
+# 9. 获取真实访问地址
+echo "🌐 获取真实访问地址..."
+
+# 获取 LoadBalancer 外部 IP
+IM_CMS_IP=$(kubectl get svc im-cms-loadbalancer -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+OPENIM_API_IP=$(kubectl get svc openim-api-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+CHAT_API_IP=$(kubectl get svc chat-api-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+ADMIN_API_IP=$(kubectl get svc admin-api-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+MESSAGEGATEWAY_IP=$(kubectl get svc messagegateway-public -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "")
+
+# 如果 LoadBalancer IP 为空，尝试获取 NodePort
+if [ -z "$IM_CMS_IP" ]; then
+    IM_CMS_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || echo "your-server-ip")
+fi
+
+if [ -z "$OPENIM_API_IP" ]; then
+    OPENIM_API_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || echo "your-server-ip")
+fi
+
+if [ -z "$CHAT_API_IP" ]; then
+    CHAT_API_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || echo "your-server-ip")
+fi
+
+if [ -z "$ADMIN_API_IP" ]; then
+    ADMIN_API_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || echo "your-server-ip")
+fi
+
+if [ -z "$MESSAGEGATEWAY_IP" ]; then
+    MESSAGEGATEWAY_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="ExternalIP")].address}' 2>/dev/null || kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null || echo "your-server-ip")
+fi
+
+# 10. 清理临时文件
 cd /
 rm -rf "$TEMP_DIR"
 
 echo "=========================================="
 echo "✅ 部署完成！"
 echo "=========================================="
-echo "访问地址:"
-echo "  - OpenIM API: http://your-server-ip:10002"
-echo "  - Message Gateway: http://your-server-ip:10001"
+echo "🌐 真实访问地址:"
+echo "  - im-cms 前端: http://$IM_CMS_IP"
+echo "  - OpenIM API: http://$OPENIM_API_IP:10002"
+echo "  - Chat API: http://$CHAT_API_IP:10008"
+echo "  - Admin API: http://$ADMIN_API_IP:10009"
+echo "  - MessageGateway WebSocket: ws://$MESSAGEGATEWAY_IP:10001"
+echo "=========================================="
+echo "📋 服务状态检查:"
+echo "  - 检查 Pod 状态: kubectl get pods"
+echo "  - 检查服务状态: kubectl get svc"
+echo "  - 检查日志: kubectl logs -l app=user-rpc-server"
 echo "=========================================="
