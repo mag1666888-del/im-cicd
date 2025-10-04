@@ -193,6 +193,19 @@ kubectl apply -f "$TEMP_DIR/openim-api-service.yml"
 kubectl apply -f "$TEMP_DIR/openim-crontask-deployment.yml"
 
 echo "📄 部署用户相关组件..."
+# 先部署其他 RPC 服务，再部署 user-rpc（避免服务发现问题）
+kubectl apply -f "$TEMP_DIR/openim-rpc-msg-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-friend-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-group-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-conversation-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-third-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-push-service.yml"
+
+# 等待其他 RPC 服务启动
+echo "⏳ 等待其他 RPC 服务启动..."
+sleep 10
+
+# 最后部署 user-rpc
 kubectl apply -f "$TEMP_DIR/openim-rpc-user-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-user-service.yml"
 
@@ -292,11 +305,36 @@ kubectl wait --for=condition=available --timeout=300s deployment/openim-api -n "
 kubectl wait --for=condition=available --timeout=300s deployment/openim-chat-api -n "$NS" || true
 kubectl wait --for=condition=available --timeout=300s deployment/openim-admin-api -n "$NS" || true
 
+# 等待 RPC 服务启动
+echo "⏳ 等待 RPC 服务启动..."
+kubectl wait --for=condition=available --timeout=300s deployment/user-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/msg-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/friend-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/group-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/conversation-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/third-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/push-rpc-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/auth-rpc-server -n "$NS" || true
+
 # 10. 显示部署状态
 echo "📊 部署状态:"
 kubectl get pods -n "$NS"
 kubectl get svc -n "$NS"
 kubectl get ingress -n "$NS"
+
+# 11. 验证服务健康状态
+echo "🔍 验证服务健康状态..."
+echo "检查 RPC 服务日志..."
+kubectl logs -l app=user-rpc-server --tail=10 | grep -E "(service not found|ERROR|WARN)" || echo "✅ user-rpc 服务正常"
+kubectl logs -l app=admin-api-server --tail=10 | grep -E "(ERROR|WARN)" || echo "✅ admin-api 服务正常"
+kubectl logs -l app=chat-api-server --tail=10 | grep -E "(ERROR|WARN)" || echo "✅ chat-api 服务正常"
+
+# 12. 显示访问信息
+echo "🌐 访问信息:"
+echo "  - im-cms 前端: http://your-server-ip (通过 LoadBalancer)"
+echo "  - OpenIM API: http://your-server-ip:10002"
+echo "  - Chat API: http://your-server-ip:10008"
+echo "  - Admin API: http://your-server-ip:10009"
 
 # 11. 清理临时文件
 rm -rf "$TEMP_DIR"

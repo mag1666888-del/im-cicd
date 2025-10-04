@@ -165,6 +165,19 @@ kubectl apply -f "$TEMP_DIR/openim-api-service.yml"
 kubectl apply -f "$TEMP_DIR/openim-crontask-deployment.yml"
 
 echo "📄 部署用户相关组件..."
+# 先部署其他 RPC 服务，再部署 user-rpc（避免服务发现问题）
+kubectl apply -f "$TEMP_DIR/openim-rpc-msg-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-friend-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-group-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-conversation-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-third-service.yml"
+kubectl apply -f "$TEMP_DIR/openim-rpc-push-service.yml"
+
+# 等待其他 RPC 服务启动
+echo "⏳ 等待其他 RPC 服务启动..."
+sleep 10
+
+# 最后部署 user-rpc
 kubectl apply -f "$TEMP_DIR/openim-rpc-user-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-user-service.yml"
 
