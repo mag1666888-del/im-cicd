@@ -8,6 +8,7 @@
 - **`onekey-build-and-deploy.sh`** - 一键构建并部署（二开镜像）
 - **`ack-onekey-external.sh`** - 一键安装到ACK（全新集群）
 - **`ack-onekey-official.sh`** - 一键安装（官方部署方式）
+- **`deploy-from-git.sh`** - 从Git仓库直接部署（服务端推荐）
 - **`update-ack.sh`** - 更新ACK应用版本
 - **`cleanup-installation.sh`** - 清理已安装的组件
 - **`utils.sh`** - 工具函数库
@@ -29,6 +30,9 @@
 # 官方部署方式
 ./main.sh onekey-official
 
+# 从Git仓库直接部署（推荐）
+./main.sh deploy-git
+
 # 更新应用版本
 ./main.sh update openim-cms v1.0.1
 
@@ -47,6 +51,9 @@
 
 # 官方部署方式
 ./ack-onekey-official.sh
+
+# 从Git仓库直接部署（推荐）
+./deploy-from-git.sh
 
 # 更新应用版本
 ./update-ack.sh openim-cms v1.0.1
@@ -80,9 +87,17 @@
 
 ### 官方部署方式 (`ack-onekey-official.sh`)
 - 按照官方方式使用 `kubectl apply -f` 部署
-- 从 `open-im-server` 和 `chat` 目录复制部署文件
+- 从 `config/open-im-server` 和 `config/chat` 目录复制部署文件
+- 按照官方文档顺序部署各个组件
 - 自动更新镜像标签和外部服务地址
 - 完全遵循官方部署流程
+
+### 从Git仓库直接部署 (`deploy-from-git.sh`)
+- 从 `config` 目录读取本地配置文件
+- 按照官方文档顺序部署各个组件
+- 自动更新镜像标签和外部服务地址
+- 支持服务端独立运行
+- 无需下载外部文件
 
 ### 更新应用版本 (`update-ack.sh`)
 - 更新指定项目到新版本
@@ -94,6 +109,65 @@
 - 包括 Deployments、Services、ConfigMaps、Secrets、Ingress 等
 - 支持交互式确认和强制清理
 - 可选择是否删除命名空间
+
+## 📋 部署顺序（按照官方文档）
+
+### 1. 基础设施 Secrets
+```bash
+kubectl apply -f redis-secret.yml -f minio-secret.yml -f mongo-secret.yml -f kafka-secret.yml
+```
+
+### 2. 配置文件
+```bash
+kubectl apply -f ./openim-config.yml
+```
+
+### 3. OpenIM Server 组件（按顺序）
+```bash
+kubectl apply \
+  -f openim-api-deployment.yml \
+  -f openim-api-service.yml \
+  -f openim-crontask-deployment.yml \
+  -f openim-rpc-user-deployment.yml \
+  -f openim-rpc-user-service.yml \
+  -f openim-msggateway-deployment.yml \
+  -f openim-msggateway-service.yml \
+  -f openim-push-deployment.yml \
+  -f openim-push-service.yml \
+  -f openim-msgtransfer-service.yml \
+  -f openim-msgtransfer-deployment.yml \
+  -f openim-rpc-conversation-deployment.yml \
+  -f openim-rpc-conversation-service.yml \
+  -f openim-rpc-auth-deployment.yml \
+  -f openim-rpc-auth-service.yml \
+  -f openim-rpc-group-deployment.yml \
+  -f openim-rpc-group-service.yml \
+  -f openim-rpc-friend-deployment.yml \
+  -f openim-rpc-friend-service.yml \
+  -f openim-rpc-msg-deployment.yml \
+  -f openim-rpc-msg-service.yml \
+  -f openim-rpc-third-deployment.yml \
+  -f openim-rpc-third-service.yml
+```
+
+### 4. Chat 组件（按顺序）
+```bash
+# 4.1 Chat 相关 Secrets
+kubectl apply -f redis-secret.yml -f mongo-secret.yml
+
+# 4.2 Chat 配置和服务
+kubectl apply -f chat-config.yml -f openim-admin-api-service.yml -f openim-chat-api-service.yml -f openim-admin-rpc-service.yml -f openim-chat-rpc-service.yml
+
+# 4.3 Chat 部署文件
+kubectl apply -f openim-chat-api-deployment.yml -f openim-admin-api-deployment.yml -f openim-chat-rpc-deployment.yml -f openim-admin-rpc-deployment.yml
+```
+
+### 5. 前端和管理界面
+- im-cms 管理后台
+
+### 6. 公网访问
+- Ingress 配置
+- LoadBalancer 服务
 
 ## 🔧 依赖要求
 

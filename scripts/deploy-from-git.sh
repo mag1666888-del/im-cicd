@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# 一键安装（ACK全新集群）- 使用官方部署文件
-# 按照官方方式使用 kubectl apply -f xxxx.yml 部署
+# 从 Git 仓库直接部署 OpenIM
+# 适用于服务端独立运行
 
 # 配置参数
 NS=${NS:-default}
@@ -32,137 +32,109 @@ KAFKA_PORT=${KAFKA_PORT:-9092}
 KAFKA_USERNAME=${KAFKA_USERNAME:-myopenim}
 KAFKA_PASSWORD=${KAFKA_PASSWORD:-rI57PJsJhnz_qlRkfnTa0RPT}
 
-# 脚本目录
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CONFIG_DIR="$SCRIPT_DIR/../config"
-
-# 使用 config 目录中的配置文件
-OPENIM_DEPLOY_DIR="$CONFIG_DIR/open-im-server"
-CHAT_DEPLOY_DIR="$CONFIG_DIR/chat"
-
-echo "📁 使用配置文件目录:"
-echo "  OpenIM: $OPENIM_DEPLOY_DIR"
-echo "  Chat: $CHAT_DEPLOY_DIR"
-
 echo "=========================================="
-echo "OpenIM 一键安装脚本 (官方部署方式)"
+echo "OpenIM 从 Git 仓库部署脚本"
 echo "=========================================="
 echo "命名空间: $NS"
 echo "Docker用户: $DOCKER_USER"
 echo "镜像标签: $TAG"
-echo "项目根目录: $PROJECT_ROOT"
-echo "OpenIM部署目录: $OPENIM_DEPLOY_DIR"
-echo "Chat部署目录: $CHAT_DEPLOY_DIR"
 echo "=========================================="
-
-# 检查必要目录
-if [ ! -d "$OPENIM_DEPLOY_DIR" ]; then
-    echo "❌ 错误: 找不到 open-im-server 部署目录: $OPENIM_DEPLOY_DIR"
-    exit 1
-fi
-
-if [ ! -d "$CHAT_DEPLOY_DIR" ]; then
-    echo "❌ 错误: 找不到 chat 部署目录: $CHAT_DEPLOY_DIR"
-    exit 1
-fi
 
 # 创建命名空间
 echo "📦 创建命名空间..."
 kubectl get ns "$NS" >/dev/null 2>&1 || kubectl create ns "$NS"
-
-# 设置默认命名空间
 kubectl config set-context --current --namespace="$NS"
 
 # 1. 部署 RBAC
 echo "🔐 部署 RBAC..."
-kubectl apply -f "$OPENIM_DEPLOY_DIR/clusterRole.yml"
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/clusterRole.yml
 
-# 2. 部署基础设施 Secrets（使用官方命名）
+# 2. 创建 Secrets
 echo "🔑 创建基础设施 Secrets..."
 
-# Redis Secret（官方命名：openim-redis-secret）
+# Redis Secret
 kubectl create secret generic openim-redis-secret -n "$NS" \
   --from-literal=redis-password="$REDIS_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# MongoDB Secret（官方命名：openim-mongo-secret）
+# MongoDB Secret
 kubectl create secret generic openim-mongo-secret -n "$NS" \
   --from-literal=mongo_openim_username="$MONGO_USERNAME" \
   --from-literal=mongo_openim_password="$MONGO_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# MinIO Secret（官方命名：openim-minio-secret）
+# MinIO Secret
 kubectl create secret generic openim-minio-secret -n "$NS" \
   --from-literal=minio-root-user="$MINIO_ACCESS_KEY" \
   --from-literal=minio-root-password="$MINIO_SECRET_KEY" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# Kafka Secret（官方命名：openim-kafka-secret）
+# Kafka Secret
 kubectl create secret generic openim-kafka-secret -n "$NS" \
   --from-literal=kafka-password="$KAFKA_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# 3. 部署外部基础设施服务（用于服务发现）
+# 3. 部署外部基础设施服务
 echo "🏗️ 部署外部基础设施服务..."
 
 # Redis 服务
-kubectl apply -f "$OPENIM_DEPLOY_DIR/redis-service.yml"
-kubectl apply -f "$OPENIM_DEPLOY_DIR/redis-secret.yml"
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/redis-service.yml
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/redis-secret.yml
 
 # MongoDB 服务
-kubectl apply -f "$OPENIM_DEPLOY_DIR/mongo-service.yml"
-kubectl apply -f "$OPENIM_DEPLOY_DIR/mongo-secret.yml"
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/mongo-service.yml
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/mongo-secret.yml
 
 # MinIO 服务
-kubectl apply -f "$OPENIM_DEPLOY_DIR/minio-service.yml"
-kubectl apply -f "$OPENIM_DEPLOY_DIR/minio-secret.yml"
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/minio-service.yml
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/minio-secret.yml
 
 # Kafka 服务
-kubectl apply -f "$OPENIM_DEPLOY_DIR/kafka-service.yml"
-kubectl apply -f "$OPENIM_DEPLOY_DIR/kafka-secret.yml"
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/kafka-service.yml
+kubectl apply -f https://raw.githubusercontent.com/OpenIMSDK/Open-IM-Server/main/deployments/deploy/kafka-secret.yml
 
-# 4. 更新部署文件中的镜像和配置
-echo "🔧 更新部署文件..."
+# 4. 使用本地配置文件
+echo "🔧 使用本地配置文件..."
 
-# 创建临时目录
-TEMP_DIR=$(mktemp -d)
-echo "📁 临时目录: $TEMP_DIR"
+# 脚本目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$SCRIPT_DIR/../config"
+OPENIM_DEPLOY_DIR="$CONFIG_DIR/open-im-server"
+CHAT_DEPLOY_DIR="$CONFIG_DIR/chat"
 
-# 复制文件
-echo "📋 复制 OpenIM 部署文件..."
-cp -r "$OPENIM_DEPLOY_DIR"/* "$TEMP_DIR/"
-
-echo "📋 复制 Chat 部署文件..."
-cp -r "$CHAT_DEPLOY_DIR"/* "$TEMP_DIR/"
-
-# 验证关键文件是否存在
-if [ ! -f "$TEMP_DIR/im-cms-simple.yml" ]; then
-    echo "❌ 错误: im-cms-simple.yml 文件不存在"
-    echo "📁 临时目录内容:"
-    ls -la "$TEMP_DIR"
-    echo "📁 OpenIM 部署目录内容:"
-    ls -la "$OPENIM_DEPLOY_DIR"
+# 检查配置文件是否存在
+if [ ! -d "$OPENIM_DEPLOY_DIR" ]; then
+    echo "❌ 错误: 找不到 OpenIM 配置文件目录: $OPENIM_DEPLOY_DIR"
+    echo "请确保 config/open-im-server 目录存在并包含配置文件"
     exit 1
 fi
 
-echo "✅ 文件复制完成，开始更新配置..."
+if [ ! -d "$CHAT_DEPLOY_DIR" ]; then
+    echo "❌ 错误: 找不到 Chat 配置文件目录: $CHAT_DEPLOY_DIR"
+    echo "请确保 config/chat 目录存在并包含配置文件"
+    exit 1
+fi
 
-# 更新镜像标签
-echo "🔄 更新镜像标签..."
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|image: .*openim|image: $DOCKER_USER/openim|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|image: .*chat|image: $DOCKER_USER/chat|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|:latest|:$TAG|g" {} \;
+# 创建临时目录并复制配置文件
+TEMP_DIR=$(mktemp -d)
+echo "📁 临时目录: $TEMP_DIR"
 
-# 更新外部服务地址
-echo "🔄 更新外部服务地址..."
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|REDIS_HOST|$REDIS_HOST|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|REDIS_PORT|$REDIS_PORT|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|MONGO_HOST|$MONGO_HOST|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|MONGO_PORT|$MONGO_PORT|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|MINIO_HOST|$MINIO_HOST|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|MINIO_API_PORT|$MINIO_API_PORT|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|KAFKA_HOST|$KAFKA_HOST|g" {} \;
-find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|KAFKA_PORT|$KAFKA_PORT|g" {} \;
+echo "📋 复制 OpenIM 配置文件..."
+cp -r "$OPENIM_DEPLOY_DIR"/* "$TEMP_DIR/"
+
+echo "📋 复制 Chat 配置文件..."
+cp -r "$CHAT_DEPLOY_DIR"/* "$TEMP_DIR/"
+
+# 修改配置文件中的外部服务地址
+echo "🔄 更新配置文件..."
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/REDIS_HOST/$REDIS_HOST/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/REDIS_PORT/$REDIS_PORT/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/MONGO_HOST/$MONGO_HOST/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/MONGO_PORT/$MONGO_PORT/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/MINIO_HOST/$MINIO_HOST/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/MINIO_API_PORT/$MINIO_API_PORT/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/KAFKA_HOST/$KAFKA_HOST/g" {} \;
+find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s/KAFKA_PORT/$KAFKA_PORT/g" {} \;
 
 # 5. 部署 OpenIM Server 组件（按照官方文档顺序）
 echo "🚀 部署 OpenIM Server 组件..."
@@ -217,6 +189,11 @@ echo "📄 部署第三方组件..."
 kubectl apply -f "$TEMP_DIR/openim-rpc-third-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-rpc-third-service.yml"
 
+# 更新所有部署文件中的镜像标签
+echo "🔄 更新镜像标签..."
+find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|image: .*openim|image: $DOCKER_USER/openim|g" {} \;
+find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|:latest|:$TAG|g" {} \;
+
 # 6. 部署 Chat 组件（按照官方文档顺序）
 echo "💬 部署 Chat 组件..."
 
@@ -259,37 +236,37 @@ elif [ -f "$TEMP_DIR/im-cms-deployment.yml" ]; then
     kubectl apply -f "$TEMP_DIR/im-cms-loadbalancer.yml"
 else
     echo "⚠️ 警告: 找不到 im-cms 部署文件，跳过前端部署"
-    echo "📁 可用的 im-cms 文件:"
-    ls -la "$TEMP_DIR" | grep im-cms || echo "无 im-cms 相关文件"
 fi
 
 # 8. 部署公网访问
 echo "🌐 部署公网访问..."
 
-# 部署 Ingress
-kubectl apply -f "$TEMP_DIR/ingress.yml"
+# 部署 Ingress 配置
+if [ -f "$TEMP_DIR/ingress.yml" ]; then
+    echo "📄 部署 ingress.yml..."
+    kubectl apply -f "$TEMP_DIR/ingress.yml"
+else
+    echo "⚠️ 警告: 找不到 ingress.yml 文件，跳过 Ingress 部署"
+fi
 
-# 9. 等待部署完成
+# 7. 等待部署完成
 echo "⏳ 等待部署完成..."
 kubectl wait --for=condition=available --timeout=300s deployment/openim-api -n "$NS" || true
-kubectl wait --for=condition=available --timeout=300s deployment/openim-chat-api -n "$NS" || true
-kubectl wait --for=condition=available --timeout=300s deployment/openim-admin-api -n "$NS" || true
 
-# 10. 显示部署状态
+# 8. 显示部署状态
 echo "📊 部署状态:"
 kubectl get pods -n "$NS"
 kubectl get svc -n "$NS"
 kubectl get ingress -n "$NS"
 
-# 11. 清理临时文件
+# 9. 清理临时文件
+cd /
 rm -rf "$TEMP_DIR"
 
 echo "=========================================="
 echo "✅ 部署完成！"
 echo "=========================================="
 echo "访问地址:"
-echo "  - im-cms: http://your-server-ip"
 echo "  - OpenIM API: http://your-server-ip:10002"
-echo "  - Chat API: http://your-server-ip:10008"
-echo "  - Admin API: http://your-server-ip:10009"
+echo "  - Message Gateway: http://your-server-ip:10001"
 echo "=========================================="

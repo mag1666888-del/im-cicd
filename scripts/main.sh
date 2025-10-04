@@ -20,6 +20,7 @@ show_help() {
     echo "  onekey-build           一键构建并部署（二开镜像）"
     echo "  onekey-install         一键安装（ACK全新集群）"
     echo "  onekey-official        一键安装（官方部署方式）"
+    echo "  deploy-git             从Git仓库直接部署（服务端推荐）"
     echo "  update <project> <tag> 更新项目到指定版本"
     echo "  cleanup                清理已安装的组件"
     echo "  help                   显示帮助信息"
@@ -28,6 +29,7 @@ show_help() {
     echo "  $0 onekey-build                    # 一键构建并部署"
     echo "  $0 onekey-install                  # 一键安装到ACK"
     echo "  $0 onekey-official                 # 官方部署方式"
+    echo "  $0 deploy-git                      # 从Git仓库直接部署（推荐）"
     echo "  $0 update openim-cms v1.0.1       # 更新到v1.0.1"
     echo "  $0 cleanup                         # 清理已安装的组件"
     echo ""
@@ -56,6 +58,10 @@ main() {
         onekey-official)
             print_info "执行官方部署方式..."
             "$SCRIPT_DIR/ack-onekey-official.sh" "$@"
+            ;;
+        deploy-git)
+            print_info "从Git仓库直接部署..."
+            "$SCRIPT_DIR/deploy-from-git.sh" "$@"
             ;;
         update)
             print_info "更新项目到指定版本..."
