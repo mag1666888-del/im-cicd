@@ -23,7 +23,6 @@ data:
       auth: auth-rpc-service
       conversation: conversation-rpc-service
       third: third-rpc-service
-
   log.yml: |
     # Log storage path, default is acceptable, change to a full path if modification is needed
     storageLocation: ./logs/
