@@ -44,6 +44,9 @@ echo "=========================================="
 echo "命名空间: $NS"
 echo "Docker用户: $DOCKER_USER"
 echo "镜像标签: $TAG"
+echo "项目根目录: $PROJECT_ROOT"
+echo "OpenIM部署目录: $OPENIM_DEPLOY_DIR"
+echo "Chat部署目录: $CHAT_DEPLOY_DIR"
 echo "=========================================="
 
 # 检查必要目录
@@ -120,15 +123,35 @@ echo "🔧 更新部署文件..."
 
 # 创建临时目录
 TEMP_DIR=$(mktemp -d)
+echo "📁 临时目录: $TEMP_DIR"
+
+# 复制文件
+echo "📋 复制 OpenIM 部署文件..."
 cp -r "$OPENIM_DEPLOY_DIR"/* "$TEMP_DIR/"
+
+echo "📋 复制 Chat 部署文件..."
 cp -r "$CHAT_DEPLOY_DIR"/* "$TEMP_DIR/"
 
+# 验证关键文件是否存在
+if [ ! -f "$TEMP_DIR/im-cms-simple.yml" ]; then
+    echo "❌ 错误: im-cms-simple.yml 文件不存在"
+    echo "📁 临时目录内容:"
+    ls -la "$TEMP_DIR"
+    echo "📁 OpenIM 部署目录内容:"
+    ls -la "$OPENIM_DEPLOY_DIR"
+    exit 1
+fi
+
+echo "✅ 文件复制完成，开始更新配置..."
+
 # 更新镜像标签
+echo "🔄 更新镜像标签..."
 find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|image: .*openim|image: $DOCKER_USER/openim|g" {} \;
 find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|image: .*chat|image: $DOCKER_USER/chat|g" {} \;
 find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|:latest|:$TAG|g" {} \;
 
 # 更新外部服务地址
+echo "🔄 更新外部服务地址..."
 find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|REDIS_HOST|$REDIS_HOST|g" {} \;
 find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|REDIS_PORT|$REDIS_PORT|g" {} \;
 find "$TEMP_DIR" -name "*.yml" -type f -exec sed -i.bak "s|MONGO_HOST|$MONGO_HOST|g" {} \;
@@ -196,8 +219,20 @@ kubectl apply -f "$TEMP_DIR/openim-admin-api-service.yml"
 # 7. 部署前端和管理界面
 echo "🖥️ 部署前端和管理界面..."
 
-# 部署 im-cms
-kubectl apply -f "$TEMP_DIR/im-cms-simple.yml"
+# 检查 im-cms 文件是否存在
+if [ -f "$TEMP_DIR/im-cms-simple.yml" ]; then
+    echo "📄 部署 im-cms-simple.yml..."
+    kubectl apply -f "$TEMP_DIR/im-cms-simple.yml"
+elif [ -f "$TEMP_DIR/im-cms-deployment.yml" ]; then
+    echo "📄 部署 im-cms-deployment.yml..."
+    kubectl apply -f "$TEMP_DIR/im-cms-deployment.yml"
+    kubectl apply -f "$TEMP_DIR/im-cms-nginx-configmap.yml"
+    kubectl apply -f "$TEMP_DIR/im-cms-loadbalancer.yml"
+else
+    echo "⚠️ 警告: 找不到 im-cms 部署文件，跳过前端部署"
+    echo "📁 可用的 im-cms 文件:"
+    ls -la "$TEMP_DIR" | grep im-cms || echo "无 im-cms 相关文件"
+fi
 
 # 8. 部署公网访问
 echo "🌐 部署公网访问..."

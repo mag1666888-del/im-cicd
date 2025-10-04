@@ -21,6 +21,7 @@ show_help() {
     echo "  onekey-install         一键安装（ACK全新集群）"
     echo "  onekey-official        一键安装（官方部署方式）"
     echo "  update <project> <tag> 更新项目到指定版本"
+    echo "  cleanup                清理已安装的组件"
     echo "  help                   显示帮助信息"
     echo ""
     echo "示例:"
@@ -28,6 +29,7 @@ show_help() {
     echo "  $0 onekey-install                  # 一键安装到ACK"
     echo "  $0 onekey-official                 # 官方部署方式"
     echo "  $0 update openim-cms v1.0.1       # 更新到v1.0.1"
+    echo "  $0 cleanup                         # 清理已安装的组件"
     echo ""
     echo "环境变量:"
     echo "  DOCKER_USER             Docker Hub用户名（默认: mag1666888）"
@@ -58,6 +60,10 @@ main() {
         update)
             print_info "更新项目到指定版本..."
             "$SCRIPT_DIR/update-ack.sh" "$@"
+            ;;
+        cleanup)
+            print_info "清理已安装的组件..."
+            "$SCRIPT_DIR/cleanup-installation.sh" "$@"
             ;;
         help|--help|-h)
             show_help
