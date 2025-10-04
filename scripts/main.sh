@@ -11,36 +11,28 @@ source "$SCRIPT_DIR/utils.sh"
 
 # 显示帮助信息
 show_help() {
-    echo "多项目构建脚本 - 统一入口"
+    echo "OpenIM 构建部署脚本 - 统一入口"
     echo ""
     echo "使用方法:"
     echo "  $0 <command> [options]"
     echo ""
     echo "命令:"
-    echo "  build-all              构建所有项目"
-    echo "  build-single <project> 构建单个项目"
-    echo "  deploy <project>       部署项目到ACK"
+    echo "  onekey-build           一键构建并部署（二开镜像）"
+    echo "  onekey-install         一键安装（ACK全新集群）"
     echo "  update <project> <tag> 更新项目到指定版本"
-    echo "  status [project]       查看项目状态"
-    echo "  logs <project>         查看项目日志"
-    echo "  cleanup                清理资源"
     echo "  help                   显示帮助信息"
     echo ""
     echo "示例:"
-    echo "  $0 build-all                    # 构建所有项目"
-    echo "  $0 build-single openim-cms      # 构建openim-cms项目"
-    echo "  $0 build-single openim-cms v1.0.0  # 构建指定版本"
-    echo "  $0 update openim-cms v1.0.1     # 更新到v1.0.1"
-    echo "  $0 status                       # 查看所有项目状态"
-    echo "  $0 status openim-cms            # 查看单个项目状态"
-    echo "  $0 cleanup                      # 清理资源"
+    echo "  $0 onekey-build                    # 一键构建并部署"
+    echo "  $0 onekey-install                  # 一键安装到ACK"
+    echo "  $0 update openim-cms v1.0.1       # 更新到v1.0.1"
     echo ""
     echo "环境变量:"
-    echo "  DOCKERHUB_USERNAME             Docker Hub用户名"
-    echo "  DOCKERHUB_PASSWORD             Docker Hub密码"
-    echo "  GITHUB_TOKEN                   GitHub Token"
-    echo "  ACK_CLUSTER_ID                 ACK集群ID"
-    echo "  ACK_REGION                     ACK区域"
+    echo "  DOCKER_USER             Docker Hub用户名（默认: mag1666888）"
+    echo "  TAG                     镜像标签（默认: dev）"
+    echo "  NAMESPACE               K8s命名空间（默认: default）"
+    echo "  OIS_DIR                 open-im-server目录（默认: /home/im/open-im-server）"
+    echo "  CHAT_DIR                chat目录（默认: /home/im/chat）"
 }
 
 # 主函数
@@ -49,33 +41,17 @@ main() {
     shift
     
     case $command in
-        build-all)
-            "$SCRIPT_DIR/build-all.sh" "$@"
+        onekey-build)
+            print_info "执行一键构建并部署..."
+            "$SCRIPT_DIR/onekey-build-and-deploy.sh" "$@"
             ;;
-        build-single)
-            "$SCRIPT_DIR/build-single.sh" "$@"
-            ;;
-        deploy)
-            print_info "部署功能暂未实现，请使用kubectl手动部署"
-            print_info "部署文件位置: projects/*/ack-deployment.yaml"
+        onekey-install)
+            print_info "执行一键安装到ACK..."
+            "$SCRIPT_DIR/ack-onekey-external.sh" "$@"
             ;;
         update)
+            print_info "更新项目到指定版本..."
             "$SCRIPT_DIR/update-ack.sh" "$@"
-            ;;
-        status)
-            "$SCRIPT_DIR/status.sh" "$@"
-            ;;
-        logs)
-            local project_name=$1
-            if [ -z "$project_name" ]; then
-                print_error "请指定项目名称"
-                exit 1
-            fi
-            print_info "查看项目日志: $project_name"
-            find ./logs -name "build-$project_name-*.log" -type f | sort -r | head -1 | xargs tail -f
-            ;;
-        cleanup)
-            "$SCRIPT_DIR/cleanup.sh" "$@"
             ;;
         help|--help|-h)
             show_help
