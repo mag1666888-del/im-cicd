@@ -12,6 +12,38 @@ spec:
       labels:
         app: user-rpc-server
     spec:
+      initContainers:
+        - name: wait-for-rpc-services
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              echo "等待依赖的 RPC 服务启动..."
+              until nslookup msg-rpc-service; do
+                echo "等待 msg-rpc-service..."
+                sleep 2
+              done
+              until nslookup friend-rpc-service; do
+                echo "等待 friend-rpc-service..."
+                sleep 2
+              done
+              until nslookup group-rpc-service; do
+                echo "等待 group-rpc-service..."
+                sleep 2
+              done
+              until nslookup conversation-rpc-service; do
+                echo "等待 conversation-rpc-service..."
+                sleep 2
+              done
+              until nslookup third-rpc-service; do
+                echo "等待 third-rpc-service..."
+                sleep 2
+              done
+              until nslookup push-rpc-service; do
+                echo "等待 push-rpc-service..."
+                sleep 2
+              done
+              echo "所有依赖的 RPC 服务已就绪"
       containers:
         - name: user-rpc-server-container
           image: mag1666888/openim-rpc-user:dev
