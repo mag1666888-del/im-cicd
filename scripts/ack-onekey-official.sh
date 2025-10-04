@@ -223,8 +223,7 @@ kubectl apply -f "$TEMP_DIR/openim-msggateway-deployment.yml"
 kubectl apply -f "$TEMP_DIR/openim-msggateway-service.yml"
 
 echo "📄 部署推送组件..."
-kubectl apply -f "$TEMP_DIR/openim-push-deployment.yml"
-kubectl apply -f "$TEMP_DIR/openim-push-service.yml"
+# push 服务已在 RPC 服务部分部署，跳过重复部署
 
 echo "📄 部署消息传输组件..."
 kubectl apply -f "$TEMP_DIR/openim-msgtransfer-service.yml"
