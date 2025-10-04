@@ -19,27 +19,27 @@ spec:
           args:
             - |
               echo "等待依赖的 RPC 服务启动..."
-              until nslookup msg-rpc-service; do
+              until nslookup msg-rpc-service.default.svc.cluster.local >/dev/null 2>&1; do
                 echo "等待 msg-rpc-service..."
                 sleep 2
               done
-              until nslookup friend-rpc-service; do
+              until nslookup friend-rpc-service.default.svc.cluster.local >/dev/null 2>&1; do
                 echo "等待 friend-rpc-service..."
                 sleep 2
               done
-              until nslookup group-rpc-service; do
+              until nslookup group-rpc-service.default.svc.cluster.local >/dev/null 2>&1; do
                 echo "等待 group-rpc-service..."
                 sleep 2
               done
-              until nslookup conversation-rpc-service; do
+              until nslookup conversation-rpc-service.default.svc.cluster.local >/dev/null 2>&1; do
                 echo "等待 conversation-rpc-service..."
                 sleep 2
               done
-              until nslookup third-rpc-service; do
+              until nslookup third-rpc-service.default.svc.cluster.local >/dev/null 2>&1; do
                 echo "等待 third-rpc-service..."
                 sleep 2
               done
-              until nslookup push-rpc-service; do
+              until nslookup push-rpc-service.default.svc.cluster.local >/dev/null 2>&1; do
                 echo "等待 push-rpc-service..."
                 sleep 2
               done
