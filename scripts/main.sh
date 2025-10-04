@@ -19,12 +19,14 @@ show_help() {
     echo "命令:"
     echo "  onekey-build           一键构建并部署（二开镜像）"
     echo "  onekey-install         一键安装（ACK全新集群）"
+    echo "  onekey-official        一键安装（官方部署方式）"
     echo "  update <project> <tag> 更新项目到指定版本"
     echo "  help                   显示帮助信息"
     echo ""
     echo "示例:"
     echo "  $0 onekey-build                    # 一键构建并部署"
     echo "  $0 onekey-install                  # 一键安装到ACK"
+    echo "  $0 onekey-official                 # 官方部署方式"
     echo "  $0 update openim-cms v1.0.1       # 更新到v1.0.1"
     echo ""
     echo "环境变量:"
@@ -48,6 +50,10 @@ main() {
         onekey-install)
             print_info "执行一键安装到ACK..."
             "$SCRIPT_DIR/ack-onekey-external.sh" "$@"
+            ;;
+        onekey-official)
+            print_info "执行官方部署方式..."
+            "$SCRIPT_DIR/ack-onekey-official.sh" "$@"
             ;;
         update)
             print_info "更新项目到指定版本..."

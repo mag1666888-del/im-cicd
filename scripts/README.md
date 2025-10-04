@@ -7,6 +7,7 @@
 - **`main.sh`** - 统一入口脚本，提供简化的命令接口
 - **`onekey-build-and-deploy.sh`** - 一键构建并部署（二开镜像）
 - **`ack-onekey-external.sh`** - 一键安装到ACK（全新集群）
+- **`ack-onekey-official.sh`** - 一键安装（官方部署方式）
 - **`update-ack.sh`** - 更新ACK应用版本
 - **`utils.sh`** - 工具函数库
 
@@ -24,6 +25,9 @@
 # 一键安装到ACK
 ./main.sh onekey-install
 
+# 官方部署方式
+./main.sh onekey-official
+
 # 更新应用版本
 ./main.sh update openim-cms v1.0.1
 ```
@@ -36,6 +40,9 @@
 
 # 一键安装到ACK
 ./ack-onekey-external.sh
+
+# 官方部署方式
+./ack-onekey-official.sh
 
 # 更新应用版本
 ./update-ack.sh openim-cms v1.0.1
@@ -63,6 +70,12 @@
 - 使用外部 Redis/Mongo/MinIO/Kafka
 - 服务发现使用 Kubernetes（ACK自带）
 - 自动配置所有必要的 K8s 资源
+
+### 官方部署方式 (`ack-onekey-official.sh`)
+- 按照官方方式使用 `kubectl apply -f` 部署
+- 从 `open-im-server` 和 `chat` 目录复制部署文件
+- 自动更新镜像标签和外部服务地址
+- 完全遵循官方部署流程
 
 ### 更新应用版本 (`update-ack.sh`)
 - 更新指定项目到新版本
