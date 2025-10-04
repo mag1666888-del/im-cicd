@@ -120,3 +120,4 @@ spec:
       port: 10001
       targetPort: 10001
   loadBalancerSourceRanges: []  # 允许所有IP访问，生产环境建议限制
+  externalTrafficPolicy: Local  # 修复连接重置问题
