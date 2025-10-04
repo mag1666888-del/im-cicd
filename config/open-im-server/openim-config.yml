@@ -367,7 +367,9 @@ data:
   share.yml: |
     secret: openIM123
 
-    imAdminUserID: ["imAdmin"]
+    imAdminUser:
+      userIDs: ["imAdmin"]
+      nicknames: ["imAdmin"]
 
     # 1: For Android, iOS, Windows, Mac, and web platforms, only one instance can be online at a time
     multiLogin:
