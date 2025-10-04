@@ -208,6 +208,8 @@ kubectl apply -f "$TEMP_DIR/openim-rpc-third-service.yml"
 echo "🔄 更新镜像标签..."
 find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|image: .*openim|image: $DOCKER_USER/openim|g" {} \;
 find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|:latest|:$TAG|g" {} \;
+# 恢复 im-cms 的镜像标签为 latest
+find "$TEMP_DIR" -name "*im-cms*.yml" -type f -exec sed -i.bak "s|mag1666888/im-cms:$TAG|mag1666888/im-cms:latest|g" {} \;
 
 # 6. 部署 Chat 组件（按照官方文档顺序）
 echo "💬 部署 Chat 组件..."
@@ -221,6 +223,8 @@ kubectl apply -f "$TEMP_DIR/mongo-secret.yml"
 echo "🔄 更新 Chat 镜像标签..."
 find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|image: .*openim-chat|image: $DOCKER_USER/openim-chat|g" {} \;
 find "$TEMP_DIR" -name "*-deployment.yml" -type f -exec sed -i.bak "s|:latest|:$TAG|g" {} \;
+# 恢复 im-cms 的镜像标签为 latest
+find "$TEMP_DIR" -name "*im-cms*.yml" -type f -exec sed -i.bak "s|mag1666888/im-cms:$TAG|mag1666888/im-cms:latest|g" {} \;
 
 # 6.3 部署 Chat 配置和服务
 echo "📄 部署 Chat 配置和服务..."
