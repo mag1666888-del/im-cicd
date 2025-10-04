@@ -22,6 +22,26 @@ spec:
               readOnly: true
             - name: nginx-conf-dir
               mountPath: /etc/nginx/conf.d
+      initContainers:
+        - name: wait-for-services
+          image: busybox:1.35
+          command: ['sh', '-c']
+          args:
+            - |
+              echo "等待依赖服务启动..."
+              until nslookup chat-api-service; do
+                echo "等待 chat-api-service..."
+                sleep 2
+              done
+              until nslookup admin-api-service; do
+                echo "等待 admin-api-service..."
+                sleep 2
+              done
+              until nslookup openim-api-service; do
+                echo "等待 openim-api-service..."
+                sleep 2
+              done
+              echo "所有依赖服务已就绪"
       containers:
         - name: im-cms-container
           image: mag1666888/im-cms:latest
