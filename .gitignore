@@ -1,2 +1,7 @@
-chat/
-open-im-server/
+# 忽略根目录下的 chat 和 open-im-server 目录
+/chat/
+/open-im-server/
+
+# 但保留 config 目录下的配置文件
+!config/chat/
+!config/open-im-server/
