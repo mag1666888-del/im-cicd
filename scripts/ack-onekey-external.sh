@@ -45,22 +45,22 @@ kubectl create clusterrolebinding default-service-reader-binding \
   --clusterrole=service-reader --serviceaccount=$NS:default \
   --dry-run=client -o yaml | kubectl apply -f -
 
-echo "[STEP] 创建 Secrets（与部署文件的 env 引用一致，同时供 Chat/Server 使用）"
-kubectl create secret generic my-open-im-redis-secret -n "$NS" \
+echo "[STEP] 创建 Secrets（使用官方命名规则）"
+kubectl create secret generic openim-redis-secret -n "$NS" \
   --from-literal=redis-password="$REDIS_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl create secret generic my-open-im-mongo-secret -n "$NS" \
+kubectl create secret generic openim-mongo-secret -n "$NS" \
   --from-literal=mongo_openim_username="$MONGO_USERNAME" \
   --from-literal=mongo_openim_password="$MONGO_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl create secret generic my-open-im-minio-secret -n "$NS" \
+kubectl create secret generic openim-minio-secret -n "$NS" \
   --from-literal=minio-root-user="$MINIO_ACCESS_KEY" \
   --from-literal=minio-root-password="$MINIO_SECRET_KEY" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-kubectl create secret generic my-open-im-kafka-secret -n "$NS" \
+kubectl create secret generic openim-kafka-secret -n "$NS" \
   --from-literal=kafka-password="$KAFKA_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 

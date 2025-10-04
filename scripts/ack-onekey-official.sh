@@ -71,31 +71,28 @@ kubectl config set-context --current --namespace="$NS"
 echo "🔐 部署 RBAC..."
 kubectl apply -f "$OPENIM_DEPLOY_DIR/clusterRole.yml"
 
-# 2. 部署基础设施 Secrets
+# 2. 部署基础设施 Secrets（使用官方命名）
 echo "🔑 创建基础设施 Secrets..."
 
-# Redis Secret
-kubectl create secret generic my-open-im-redis-secret -n "$NS" \
+# Redis Secret（官方命名：openim-redis-secret）
+kubectl create secret generic openim-redis-secret -n "$NS" \
   --from-literal=redis-password="$REDIS_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# MongoDB Secret
-kubectl create secret generic my-open-im-mongo-secret -n "$NS" \
-  --from-literal=mongo-username="$MONGO_USERNAME" \
-  --from-literal=mongo-password="$MONGO_PASSWORD" \
-  --from-literal=mongo-database="$MONGO_DATABASE" \
-  --from-literal=mongo-authsource="$MONGO_AUTHSOURCE" \
+# MongoDB Secret（官方命名：openim-mongo-secret）
+kubectl create secret generic openim-mongo-secret -n "$NS" \
+  --from-literal=mongo_openim_username="$MONGO_USERNAME" \
+  --from-literal=mongo_openim_password="$MONGO_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# MinIO Secret
-kubectl create secret generic my-open-im-minio-secret -n "$NS" \
-  --from-literal=minio-access-key="$MINIO_ACCESS_KEY" \
-  --from-literal=minio-secret-key="$MINIO_SECRET_KEY" \
+# MinIO Secret（官方命名：openim-minio-secret）
+kubectl create secret generic openim-minio-secret -n "$NS" \
+  --from-literal=minio-root-user="$MINIO_ACCESS_KEY" \
+  --from-literal=minio-root-password="$MINIO_SECRET_KEY" \
   --dry-run=client -o yaml | kubectl apply -f -
 
-# Kafka Secret
-kubectl create secret generic my-open-im-kafka-secret -n "$NS" \
-  --from-literal=kafka-username="$KAFKA_USERNAME" \
+# Kafka Secret（官方命名：openim-kafka-secret）
+kubectl create secret generic openim-kafka-secret -n "$NS" \
   --from-literal=kafka-password="$KAFKA_PASSWORD" \
   --dry-run=client -o yaml | kubectl apply -f -
 

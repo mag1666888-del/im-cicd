@@ -69,8 +69,12 @@ kubectl delete statefulset --all -n "$NS" --ignore-not-found=true || true
 echo "⚙️ 清理 ConfigMaps..."
 kubectl delete configmap --all -n "$NS" --ignore-not-found=true || true
 
-# 6. 清理 Secrets
+# 6. 清理 Secrets（使用官方命名）
 echo "🔑 清理 Secrets..."
+kubectl delete secret openim-redis-secret -n "$NS" --ignore-not-found=true || true
+kubectl delete secret openim-mongo-secret -n "$NS" --ignore-not-found=true || true
+kubectl delete secret openim-minio-secret -n "$NS" --ignore-not-found=true || true
+kubectl delete secret openim-kafka-secret -n "$NS" --ignore-not-found=true || true
 kubectl delete secret --all -n "$NS" --ignore-not-found=true || true
 
 # 7. 清理 Pods (确保所有 Pod 都被清理)
