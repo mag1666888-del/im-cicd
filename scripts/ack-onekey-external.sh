@@ -35,6 +35,21 @@ TAG=${TAG:-dev}
 
 echo "[INFO] namespace=$NS"
 
+# 先执行清理脚本
+echo "🧹 执行预清理..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/cleanup-installation.sh" ]; then
+    echo "执行清理脚本..."
+    bash "$SCRIPT_DIR/cleanup-installation.sh"
+    echo "✅ 清理完成"
+else
+    echo "⚠️  清理脚本不存在，跳过清理步骤"
+fi
+
+echo "=========================================="
+echo "开始安装 OpenIM..."
+echo "=========================================="
+
 kubectl get ns "$NS" >/dev/null 2>&1 || kubectl create ns "$NS"
 
 echo "[STEP] RBAC: 允许 default SA 读取 services/endpoints/pods"

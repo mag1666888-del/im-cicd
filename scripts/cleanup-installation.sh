@@ -6,7 +6,6 @@ set -euo pipefail
 
 # 配置参数
 NS=${NS:-default}
-FORCE=${FORCE:-false}
 
 # 脚本目录
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -18,28 +17,19 @@ echo "=========================================="
 echo "OpenIM 安装清理脚本"
 echo "=========================================="
 echo "命名空间: $NS"
-echo "强制清理: $FORCE"
-echo "项目根目录: $PROJECT_ROOT"
 echo "=========================================="
 
-# 确认清理操作
-if [ "$FORCE" != "true" ]; then
-    echo "⚠️  警告: 此操作将删除命名空间 '$NS' 中的所有 OpenIM 相关资源！"
-    echo "包括:"
-    echo "  - 所有 Deployments"
-    echo "  - 所有 Services"
-    echo "  - 所有 ConfigMaps"
-    echo "  - 所有 Secrets"
-    echo "  - 所有 Ingress"
-    echo "  - 所有 RBAC 资源"
-    echo ""
-    read -p "确认继续清理吗？(y/N): " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "❌ 取消清理操作"
-        exit 0
-    fi
-fi
+# 显示清理信息
+echo "⚠️  警告: 此操作将删除命名空间 '$NS' 中的所有 OpenIM 相关资源！"
+echo "包括:"
+echo "  - 所有 Deployments"
+echo "  - 所有 Services"
+echo "  - 所有 ConfigMaps"
+echo "  - 所有 Secrets"
+echo "  - 所有 Ingress"
+echo "  - 所有 RBAC 资源"
+echo ""
+echo "🚀 开始自动清理..."
 
 # 检查命名空间是否存在
 if ! kubectl get ns "$NS" >/dev/null 2>&1; then
@@ -95,13 +85,7 @@ kubectl delete clusterrolebinding default-service-reader-binding --ignore-not-fo
 kubectl delete clusterrole service-reader --ignore-not-found=true || true
 
 # 10. 清理命名空间（可选）
-if [ "$FORCE" = "true" ]; then
-    echo "🗑️ 删除命名空间 '$NS'..."
-    kubectl delete ns "$NS" --ignore-not-found=true || true
-    echo "✅ 命名空间 '$NS' 已删除"
-else
-    echo "ℹ️  保留命名空间 '$NS'，如需删除请使用: kubectl delete ns $NS"
-fi
+echo "ℹ️  保留命名空间 '$NS'，如需删除请使用: kubectl delete ns $NS"
 
 # 11. 显示清理结果
 echo "📊 清理结果:"

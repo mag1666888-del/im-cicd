@@ -40,6 +40,21 @@ echo "Docker用户: $DOCKER_USER"
 echo "镜像标签: $TAG"
 echo "=========================================="
 
+# 先执行清理脚本
+echo "🧹 执行预清理..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -f "$SCRIPT_DIR/cleanup-installation.sh" ]; then
+    echo "执行清理脚本..."
+    bash "$SCRIPT_DIR/cleanup-installation.sh"
+    echo "✅ 清理完成"
+else
+    echo "⚠️  清理脚本不存在，跳过清理步骤"
+fi
+
+echo "=========================================="
+echo "开始安装 OpenIM..."
+echo "=========================================="
+
 # 创建命名空间
 echo "📦 创建命名空间..."
 kubectl get ns "$NS" >/dev/null 2>&1 || kubectl create ns "$NS"

@@ -54,6 +54,20 @@ echo "OpenIM部署目录: $OPENIM_DEPLOY_DIR"
 echo "Chat部署目录: $CHAT_DEPLOY_DIR"
 echo "=========================================="
 
+# 先执行清理脚本
+echo "🧹 执行预清理..."
+if [ -f "$SCRIPT_DIR/cleanup-installation.sh" ]; then
+    echo "执行清理脚本..."
+    bash "$SCRIPT_DIR/cleanup-installation.sh"
+    echo "✅ 清理完成"
+else
+    echo "⚠️  清理脚本不存在，跳过清理步骤"
+fi
+
+echo "=========================================="
+echo "开始安装 OpenIM..."
+echo "=========================================="
+
 # 检查必要目录
 if [ ! -d "$OPENIM_DEPLOY_DIR" ]; then
     echo "❌ 错误: 找不到 open-im-server 部署目录: $OPENIM_DEPLOY_DIR"
