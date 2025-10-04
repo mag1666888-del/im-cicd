@@ -287,8 +287,8 @@ kubectl apply -f "$TEMP_DIR/ingress.yml"
 # 9. 等待部署完成
 echo "⏳ 等待部署完成..."
 kubectl wait --for=condition=available --timeout=300s deployment/openim-api -n "$NS" || true
-kubectl wait --for=condition=available --timeout=300s deployment/openim-chat-api -n "$NS" || true
-kubectl wait --for=condition=available --timeout=300s deployment/openim-admin-api -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/chat-api-server -n "$NS" || true
+kubectl wait --for=condition=available --timeout=300s deployment/admin-api-server -n "$NS" || true
 
 # 等待 RPC 服务启动
 echo "⏳ 等待 RPC 服务启动..."
