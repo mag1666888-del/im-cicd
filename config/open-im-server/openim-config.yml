@@ -371,7 +371,7 @@ data:
       userIDs: ["imAdmin"]
       nicknames: ["imAdmin"]
 
-    # 1: For Android, iOS, Windows, Mac, and web platforms, only one instance can be online at a time
+    
     multiLogin:
       policy: 1
       maxNumOneEnd: 30
